@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+    <style>
+        path {
+          stroke: #000000;
+          stroke-width: 0.25px;
+          fill: gray;
+        }
+
+        .states {
+          fill: none;
+          stroke: #fff;
+          stroke-linejoin: round;
+        }
+    </style>
+
+    <!-- D3 Libraries -->
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/queue.v1.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js" charset="utf-8"></script>
+
+  </head>
+  <body>
+
+    <script type="text/javascript">
+        
+
+        var width = 960,
+            height = 1160;
+
+        var fill = d3.scale.log()
+            .domain([10, 500])
+            .range(["white", "#006600"]);
+
+        var projection = d3.geo.albers()
+            .center([0, 43.5])
+            .rotate([71.5, 0])
+            .parallels([50, 60])
+            .scale(15000)
+            .translate([width / 2, height / 2]);
+
+        var path = d3.geo.path()
+            .projection(projection);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        d3.json("data/nh.json", function(error, nh) {
+            svg.append("g")
+                .attr("class", "zips")
+            .selectAll("path")
+                .data(topojson.feature(nh, nh.objects.subunits).features)
+            .enter().append("path")
+                .attr("d", path)
+                .style("fill", function(d) { return fill(path.area(d)); });
+
+            svg.append("path")
+              .datum(topojson.mesh(nh, nh.objects.states, function(a, b) { return a.id !== b.id; }))
+              .attr("class", "states")
+              .attr("d", path);
+        });
+
+
+        /*
+        d3.json("nh.json", function(error, nh) {
+          svg.append("path")
+              .datum(topojson.feature(nh, nh.objects.subunits))
+              .attr("d", path);
+        });
+        */
+
+
+        /*
+        d3.json("nh.json", function(error, nh) {
+          svg.append("path")
+              .datum(topojson.object(nh, nh.objects.subunits))
+              .attr("d", path);
+        });   
+        */     
+
+    </script>
+
+  </body>
+</html>
