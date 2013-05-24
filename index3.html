@@ -23,6 +23,11 @@
           font-weight: 300;
           text-anchor: middle;
         }
+
+        .vt {
+          fill: green;
+        }
+
     </style>
 
     <!-- D3 Libraries -->
@@ -38,8 +43,8 @@
     <script type="text/javascript">
         
 
-        var width = 960,
-            height = 1160;
+        var width = 550,
+            height = 770;
 
         var tooltip = d3.select("#map").append("div")
             .attr("class", "tooltip");
@@ -57,7 +62,7 @@
 
 
         var projection = d3.geo.albers()
-            .center([0, 43.5])
+            .center([0, 43.9])
             .rotate([71.5, 0])
             .parallels([50, 60])
             .scale(15000)
@@ -72,79 +77,75 @@
 
 
         queue()
-          .defer(d3.json, "data/nh.json")
+          .defer(d3.json, "data/ne_map.json")
           .defer(d3.csv, "data/id-zip.csv")
           .await(ready);
 
-        function ready(error, nh, zip) {
+        function ready(error, map, zip) {
             var zipById = {};
 
             zip.forEach(function(d) { zipById[d.id] = +d.amt; });
 
             svg.append("g")
-                .attr("class", "zips")
+                .attr("class", "vermont")
               .selectAll("path")
-                .data(topojson.feature(nh, nh.objects.subunits).features)
+                .data(topojson.feature(map, map.objects.g_vermont).features)
+              .enter().append("path")
+                .attr("class", function(d, i) { return i; })
+                .attr("d", path)
+                .style("fill", "gray")
+                .style("fill-opacity", ".5");
+                //.style("fill", function(d, i) { console.log(zipById[i]); return color(zipById[i]); });
+
+            svg.append("path")
+                .datum(topojson.mesh(map, map.objects.g_vermont, function(a, b) { return a.id !== b.id; }))
+                .attr("class", "vt")
+                .attr("d", path);
+
+            svg.append("g")
+                .attr("class", "new_hamp")
+              .selectAll("path")
+                .data(topojson.feature(map, map.objects.g_nh).features)
               .enter().append("path")
                 .attr("class", function(d, i) { return i; })
                 .attr("d", path)
                 .style("fill", function(d, i) { console.log(zipById[i]); return color(zipById[i]); });
-                //.style("fill", color(5000));
-
-
 
             svg.append("path")
-                .datum(topojson.mesh(nh, nh.objects.subunits, function(a, b) { return a.id !== b.id; }))
-                .attr("class", "towns")
+                .datum(topojson.mesh(map, map.objects.g_nh, function(a, b) { return a.id !== b.id; }))
+                .attr("class", "nh")
                 .attr("d", path);
-          }
 
-
-        /*
-        d3.json("data/nh.json", function(error, nh) {
             svg.append("g")
-                .attr("class", "zips")
-            .selectAll("path")
-                .data(topojson.feature(nh, nh.objects.subunits).features)
-            .enter().append("path")
+                .attr("class", "maine")
+              .selectAll("path")
+                .data(topojson.feature(map, map.objects.g_maine).features)
+              .enter().append("path")
                 .attr("class", function(d, i) { return i; })
                 .attr("d", path)
-                .style("fill", function(d) { return fill(path.area(d)); });
+                .style("fill", "gray")
+                .style("fill-opacity", ".5");
 
             svg.append("path")
-              .datum(topojson.mesh(nh, nh.objects.states, function(a, b) { return a.id !== b.id; }))
-              .attr("class", "states")
-              .attr("d", path);
+                .datum(topojson.mesh(map, map.objects.g_maine, function(a, b) { return a.id !== b.id; }))
+                .attr("class", "me")
+                .attr("d", path);
 
+            svg.append("g")
+                .attr("class", "mass")
+              .selectAll("path")
+                .data(topojson.feature(map, map.objects.g_mass).features)
+              .enter().append("path")
+                .attr("class", function(d, i) { return i; })
+                .attr("d", path)
+                .style("fill", "gray")
+                .style("fill-opacity", ".5");
 
-            svg.selectAll(".subunit-label")
-              .data(subunits.geometries)
-            .enter().append("text")
-              .attr("class", function(d) { return "subunit-label " + d.id; })
-              .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
-              .attr("dy", ".35em")
-              .text(function(d) { return d.properties.name; });
-
-        });
-        */
-
-
-        /*
-        d3.json("nh.json", function(error, nh) {
-          svg.append("path")
-              .datum(topojson.feature(nh, nh.objects.subunits))
-              .attr("d", path);
-        });
-        */
-
-
-        /*
-        d3.json("nh.json", function(error, nh) {
-          svg.append("path")
-              .datum(topojson.object(nh, nh.objects.subunits))
-              .attr("d", path);
-        });   
-        */     
+            svg.append("path")
+                .datum(topojson.mesh(map, map.objects.g_mass, function(a, b) { return a.id !== b.id; }))
+                .attr("class", "ma")
+                .attr("d", path);
+          }   
 
     </script>
 
