@@ -77,7 +77,7 @@
 
 
         queue()
-          .defer(d3.json, "data/ne_map.json")
+          .defer(d3.json, "data/ne-map5pct.json")
           .defer(d3.csv, "data/id-zip.csv")
           .await(ready);
 
