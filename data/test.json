@@ -1,0 +1,46 @@
+[
+    {
+        "zip": "03801",
+        "data": [
+            {
+                "year": "1999",
+                "amount": 2000,
+                "contrib": 3,
+                "signals": [
+                    "WEVO"
+                ]
+            },
+            {
+               "year": "2000",
+                "amount": 3000,
+                "contrib": 4,
+                "signals": [
+                    "W280DG",
+                    "WEVO"
+                ]
+            }
+        ]
+    },
+    {
+        "zip": "03820",
+        "data": [
+            {
+                "year": "1999",
+                "amount": 5000,
+                "contrib": 7,
+                "signals": [
+                    "WEVO"
+                ]
+            },
+            {
+               "year": "2000",
+                "amount": 8000,
+                "contrib": 9,
+                "signals": [
+                    "W280DG",
+                    "WEVO"
+                ]
+            }
+        ]
+    }
+]
