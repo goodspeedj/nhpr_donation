@@ -79,7 +79,7 @@
 
 
         queue()
-          .defer(d3.json, "data/ne-map5pct.json")
+          .defer(d3.json, "data/ne_map.json")
           .defer(d3.csv, "data/id-zip.csv")
           .defer(d3.csv, "data/test.csv")
           .await(ready);
@@ -88,7 +88,7 @@
             var zipById = {};
             var amtByZip = new Object();
 
-            zip.forEach(function(d) { zipById[d.id] = +d.zip; });
+            zip.forEach(function(d) { zipById[d.id] = +d.zip.toString(); });
             //zip.forEach(function(d) { zipById[d.id] = +d.amt; });
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
 
