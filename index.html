@@ -119,8 +119,11 @@
           .attr("id", "mapbg")
           .on("click", reset);
 
-
-        var g_nh = svg.append("g");
+        var g = svg.append("g");
+        var g_ma = g.append("g");
+        var g_me = g.append("g");
+        var g_nh = g.append("g");
+        var g_vt = g.append("g");
 
 
         // function to zoom in on a country in the map by user click
@@ -130,7 +133,7 @@
           if (active === d) return reset();
             
           // clicking a second country while zoomed in will de-activate (un-highlight) the first
-          g_nh.selectAll(".active").classed("active", false);
+          g.selectAll(".active").classed("active", false);
 
           // highlights (fills) the country clicked
           d3.select(this).classed("active", active = d);
@@ -138,12 +141,12 @@
           var centroid = path.centroid(d);
           var x = centroid[0];
           var y = centroid[1];
-          var k = 2;
+          var k = 4;
 
-          g_nh.transition()
+          g.transition()
               .duration(1000)
-              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
-              .style("stroke-width", 1.5 / k + "px");
+              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
+              //.style("stroke-width", 1.5 / k + "px");
        
         }
 
@@ -151,12 +154,14 @@
         // zooms the map back out
         function reset() {
 
-          g_nh.selectAll(".active").classed("active", active = false);
-          g_nh.transition().duration(750).attr("transform", "translate(0,0)");;
-          g_nh.selectAll(".nh_town")
+          console.log("in the reset");
+
+          g.selectAll(".active").classed("active", active = false);
+          g.transition().duration(750).attr("transform", "translate(0,0)");;
+          g.selectAll(".town")
               .transition()
-                .duration(750)
-              .style("stroke-width", ".5px");
+                .duration(750);
+              //.style("stroke-width", ".5px");
         }
 
 
@@ -181,14 +186,13 @@
             /*
              * Vermont
              */
-            svg.append("g")
-                .attr("class", "vermont")
+            //svg.append("g")
+                g_vt.attr("class", "vermont")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_vermont).features)
               .enter().append("path")
                 // Adds the zip code as a class of the path
-                .attr("class", function(d) { return d.properties.ZCTA5CE10; })
-                .attr("class", "town")
+                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
                 .style("fill", "gray")
                 .style("fill-opacity", ".5");
@@ -211,7 +215,7 @@
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_nh).features)
               .enter().append("path")
-                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " nh_town"; })
+                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
                 .style("fill", function(d, i) { return color(zipById[i]); });
 
@@ -220,46 +224,17 @@
                 .attr("class", "nh")
                 .attr("d", path);
 
-            //var nhTown = g_nh.selectAll(".nh_town").data(nhTowns);
-            var nhTown = g_nh.selectAll(".nh_town").on("click", click);
-            //console.log(nhTown);
-
-            /*
-            nhTown
-             .enter()
-              .insert("path")
-              .attr("class", function(d,i) { return d.name + " country"; })   
-                .attr("title", function(d,i) { return d.name; })  // country name
-                .attr("d", path)
-                .on("click", click);
-                */
-
-            // Show/hide tooltip
-            nhTown
-              .on("mousemove", function(d,i) {
-                var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
-                //console.log(mouse);
-
-                tooltip
-                  .classed("hidden", false)
-                  .attr("style", "left:" + (mouse[0]+670) + "px;top:" + (mouse[1]+60) + "px")
-                  .html("test")
-              })
-              .on("mouseout",  function(d,i) {
-                tooltip.classed("hidden", true)
-              });
-
 
             /*
              * Maine
              */
-            svg.append("g")
-                .attr("class", "maine")
+            //svg.append("g")
+                g_me.attr("class", "maine")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_maine).features)
               .enter().append("path")
                 // Adds the zip code as a class of the path
-                .attr("class", function(d) { return d.properties.ZCTA5CE10; })
+                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
                 .style("fill", "gray")
                 .style("fill-opacity", ".5");
@@ -273,12 +248,12 @@
             /*
              * Massachusetts
              */
-            svg.append("g")
-                .attr("class", "mass")
+            //svg.append("g")
+                g_ma.attr("class", "mass")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_mass).features)
               .enter().append("path")
-                .attr("class", function(d) { return d.properties.ZCTA5CE10; })
+                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
                 .style("fill", "gray")
                 .style("fill-opacity", ".5");
@@ -289,7 +264,34 @@
                 .attr("d", path);
 
 
-            
+            //var nhTown = g_nh.selectAll(".nh_town").data(nhTowns);
+            var town = g.selectAll(".town").on("click", click);
+            //console.log(nhTown);
+
+            /*
+            nhTown
+             .enter()
+              .insert("path")
+              .attr("class", function(d,i) { return d.name + " country"; })   
+                .attr("title", function(d,i) { return d.name; })  // country name
+                .attr("d", path)
+                .on("click", click);
+                */
+
+            // Show/hide tooltip
+            town
+              .on("mousemove", function(d,i) {
+                var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
+                //console.log(mouse);
+
+                tooltip
+                  .classed("hidden", false)
+                  .attr("style", "left:" + (mouse[0]+670) + "px;top:" + (mouse[1]+60) + "px")
+                  .html("test")
+              })
+              .on("mouseout",  function(d,i) {
+                tooltip.classed("hidden", true)
+              });
 
           }   
 
