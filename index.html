@@ -4,6 +4,12 @@
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 
    <style>
+
+        #mapbg {
+          fill: none;
+          pointer-events: all;
+        }
+
        path {
          stroke: #000000;
          stroke-width: 0.25px;
@@ -28,6 +34,35 @@
          fill: green;
        }
 
+       div.tooltip {
+        color: #222; 
+        font-size: 11px;
+        font-family: sans-serif;
+        background: #fff; 
+        padding: .5em; 
+        text-shadow: #f5f5f5 0 1px 0;
+        border-radius: 2px; 
+        box-shadow: 0px 0px 2px 0px #a6a6a6; 
+        opacity: 0.9; 
+        position: absolute;
+      }
+
+      .nh_town {
+        fill: #ccc;
+        stroke: gray;
+        stroke-width: .5px;
+        stroke-linejoin: round;
+        cursor: pointer;
+      }
+
+      .hidden { 
+        display: none; 
+      }
+
+      .active {
+        fill: #DE2D26;
+      }
+
    </style>
 
    <!-- D3 Libraries -->
@@ -47,6 +82,7 @@
          //var height = 770;
         var width = 1000;
         var height = 2000;
+        var active;
 
         var tooltip = d3.select("#map").append("div")
             .attr("class", "tooltip");
@@ -76,6 +112,52 @@
         var svg = d3.select("#map").append("svg")
             .attr("width", width)
             .attr("height", height);
+
+        svg.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("id", "mapbg")
+          .on("click", reset);
+
+
+        var g_nh = svg.append("g");
+
+
+        // function to zoom in on a country in the map by user click
+        function click(d) {
+
+          // if already active clicking will de-activate
+          if (active === d) return reset();
+            
+          // clicking a second country while zoomed in will de-activate (un-highlight) the first
+          g_nh.selectAll(".active").classed("active", false);
+
+          // highlights (fills) the country clicked
+          d3.select(this).classed("active", active = d);
+
+          var centroid = path.centroid(d);
+          var x = centroid[0];
+          var y = centroid[1];
+          var k = 2;
+
+          g_nh.transition()
+              .duration(1000)
+              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+              .style("stroke-width", 1.5 / k + "px");
+       
+        }
+
+
+        // zooms the map back out
+        function reset() {
+
+          g_nh.selectAll(".active").classed("active", active = false);
+          g_nh.transition().duration(750).attr("transform", "translate(0,0)");;
+          g_nh.selectAll(".nh_town")
+              .transition()
+                .duration(750)
+              .style("stroke-width", ".5px");
+        }
 
 
         queue()
@@ -124,12 +206,12 @@
             var nhTowns = topojson.feature(map, map.objects.g_nh.geometries);
             //var nhTowns = topojson.feature(map, map.objects.g_nh).geometries;
 
-            var g_nh = svg.append("g")
-                .attr("class", "new_hamp")
+            //var g_nh = svg.append("g")
+                g_nh.attr("class", "new_hamp")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_nh).features)
               .enter().append("path")
-                .attr("class", function(d) { return "nh_town " + d.properties.ZCTA5CE10; })
+                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " nh_town"; })
                 .attr("d", path)
                 .style("fill", function(d, i) { return color(zipById[i]); });
 
@@ -138,14 +220,25 @@
                 .attr("class", "nh")
                 .attr("d", path);
 
-            var nhTown = g_nh.selectAll(".nh_town").data(nhTowns);
+            //var nhTown = g_nh.selectAll(".nh_town").data(nhTowns);
+            var nhTown = g_nh.selectAll(".nh_town").on("click", click);
             //console.log(nhTown);
+
+            /*
+            nhTown
+             .enter()
+              .insert("path")
+              .attr("class", function(d,i) { return d.name + " country"; })   
+                .attr("title", function(d,i) { return d.name; })  // country name
+                .attr("d", path)
+                .on("click", click);
+                */
 
             // Show/hide tooltip
             nhTown
               .on("mousemove", function(d,i) {
                 var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
-                console.log(mouse);
+                //console.log(mouse);
 
                 tooltip
                   .classed("hidden", false)
