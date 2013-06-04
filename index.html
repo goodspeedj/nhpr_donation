@@ -61,7 +61,8 @@
 
       .boundary {
         fill: none;
-        stroke: #424242;
+        /*stroke: #424242;*/
+        stroke: blue;
         stroke-width: 1px;
       }
 
@@ -154,8 +155,6 @@
         // zooms the map back out
         function reset() {
 
-          console.log("in the reset");
-
           g.selectAll(".active").classed("active", active = false);
           g.transition().duration(750).attr("transform", "translate(0,0)");;
           g.selectAll(".town")
@@ -179,7 +178,7 @@
 
             //zip.forEach(function(d) { zipById[d.id] = +d.zip.toString(); });
             //zip.forEach(function(d) { zipById[d.id] = +d.amt; });
-            donation.forEach(function(d) { console.log(d.zip); amtByZip[d.zip] = +d.amt });
+            donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
 
 
             /*
@@ -192,9 +191,7 @@
                 // Adds the zip code as a class of the path
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); })
-                .style("fill-opacity", ".5");
-                //.style("fill", function(d, i) { console.log(zipById[i]); return color(zipById[i]); });
+                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
 
             // paints the state border
             g_vt.append("path")
@@ -215,12 +212,26 @@
               .enter().append("path")
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
-                //.style("fill", function(d, i) { return color(zipById[i]); });
 
             // paints the state border
             g_nh.append("path")
-                .datum(topojson.mesh(map, map.objects.g_nh, function(a, b) { return a === b; }))
+                .datum(topojson.mesh(map, map.objects.g_nh, function(a, b) { 
+                    return a !== b && a === b
+
+                           /* don't display boundry lines on the interior (ie: lakes)
+                          (a.properties.ZCTA5CE10 !== "03215" &&
+                           a.properties.ZCTA5CE10 !== "03285" &&
+                           a.properties.ZCTA5CE10 !== "03251" &&
+                           a.properties.ZCTA5CE10 !== "03812" &&
+                           a.properties.ZCTA5CE10 !== "03593" &&
+                           a.properties.ZCTA5CE10 !== "03575" &&
+                           a.properties.ZCTA5CE10 !== "03818" &&
+                           a.properties.ZCTA5CE10 !== "03838" &&
+                           a.properties.ZCTA5CE10 !== "03570" &&
+                           a.properties.ZCTA5CE10 !== "03583" ||
+                           a !== b)
+                          */
+                  }))
                 .attr("class", "boundary")
                 .attr("d", path);
 
@@ -235,12 +246,26 @@
                 // Adds the zip code as a class of the path
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); })
-                .style("fill-opacity", ".5");
+                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
 
             // paints the state border
             g_me.append("path")
-                .datum(topojson.mesh(map, map.objects.g_maine, function(a, b) { return a === b; }))
+                .datum(topojson.mesh(map, map.objects.g_maine, function(a, b) { 
+                    return a === b && 
+
+                           // don't display boundry lines on the interior (ie: lakes)
+                           a.properties.ZCTA5CE10 !== "04084" &&
+                           a.properties.ZCTA5CE10 !== "04029" &&
+                           a.properties.ZCTA5CE10 !== "04055" &&
+                           a.properties.ZCTA5CE10 !== "04015" &&
+                           a.properties.ZCTA5CE10 !== "04071" &&
+                           a.properties.ZCTA5CE10 !== "04062" &&
+                           a.properties.ZCTA5CE10 !== "04982" &&
+                           a.properties.ZCTA5CE10 !== "04936" &&
+                           a.properties.ZCTA5CE10 !== "04961" &&
+                           a.properties.ZCTA5CE10 !== "04945" &&
+                           a.properties.ZCTA5CE10 !== "04985" 
+                  }))
                 .attr("class", "boundary")
                 .attr("d", path);
 
@@ -254,8 +279,7 @@
               .enter().append("path")
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); })
-                .style("fill-opacity", ".5");
+                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
 
              // paints the state border
             g_ma.append("path")
