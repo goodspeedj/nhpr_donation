@@ -30,10 +30,6 @@
          text-anchor: middle;
        }
 
-       .vt {
-         fill: green;
-       }
-
        div.tooltip {
         color: #222; 
         font-size: 11px;
@@ -43,11 +39,11 @@
         text-shadow: #f5f5f5 0 1px 0;
         border-radius: 2px; 
         box-shadow: 0px 0px 2px 0px #a6a6a6; 
-        opacity: 0.9; 
+        opacity: .86; 
         position: absolute;
       }
 
-      .nh_town {
+      .town {
         fill: #ccc;
         stroke: gray;
         stroke-width: .5px;
@@ -78,10 +74,10 @@
    <script type="text/javascript">
        
 
-         //var width = 550,
-         //var height = 770;
-        var width = 1000;
-        var height = 2000;
+        var width = 550;
+        var height = 770;
+        //var width = 1000;
+        //var height = 2000;
         var active;
 
         var tooltip = d3.select("#map").append("div")
@@ -95,8 +91,6 @@
         var color = d3.scale.threshold()
             .domain([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000])
             .range(["#FFFFFF", "#F7FCFD", "#E5F5F9", "#CCECE6", "#99D8C9", "#66C2A4", "#41AE76", "#238B45", "#006D2C", "#00441B", "#002900"]);
-
-
 
 
         var projection = d3.geo.albers()
@@ -173,28 +167,25 @@
 
         function ready(error, map, zip, donation) {
 
-            
-
             var zipById = {};
             var amtByZip = new Object();
 
-            zip.forEach(function(d) { zipById[d.id] = +d.zip.toString(); });
-            //zip.forEach(function(d) { zipById[d.id] = +d.amt; });
+            //zip.forEach(function(d) { zipById[d.id] = +d.zip.toString(); });
+            zip.forEach(function(d) { zipById[d.id] = +d.amt; });
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
 
 
             /*
              * Vermont
              */
-            //svg.append("g")
-                g_vt.attr("class", "vermont")
+            g_vt.attr("class", "vermont")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_vermont).features)
               .enter().append("path")
                 // Adds the zip code as a class of the path
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", "gray")
+                .style("fill", function(d, i) { return color(amtByZip[i]); })
                 .style("fill-opacity", ".5");
                 //.style("fill", function(d, i) { console.log(zipById[i]); return color(zipById[i]); });
 
@@ -210,8 +201,7 @@
             var nhTowns = topojson.feature(map, map.objects.g_nh.geometries);
             //var nhTowns = topojson.feature(map, map.objects.g_nh).geometries;
 
-            //var g_nh = svg.append("g")
-                g_nh.attr("class", "new_hamp")
+            g_nh.attr("class", "new_hamp")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_nh).features)
               .enter().append("path")
@@ -228,8 +218,7 @@
             /*
              * Maine
              */
-            //svg.append("g")
-                g_me.attr("class", "maine")
+            g_me.attr("class", "maine")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_maine).features)
               .enter().append("path")
@@ -248,8 +237,7 @@
             /*
              * Massachusetts
              */
-            //svg.append("g")
-                g_ma.attr("class", "mass")
+            g_ma.attr("class", "mass")
               .selectAll("path")
                 .data(topojson.feature(map, map.objects.g_mass).features)
               .enter().append("path")
@@ -264,9 +252,7 @@
                 .attr("d", path);
 
 
-            //var nhTown = g_nh.selectAll(".nh_town").data(nhTowns);
             var town = g.selectAll(".town").on("click", click);
-            //console.log(nhTown);
 
             /*
             nhTown
@@ -282,12 +268,11 @@
             town
               .on("mousemove", function(d,i) {
                 var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
-                //console.log(mouse);
 
                 tooltip
                   .classed("hidden", false)
-                  .attr("style", "left:" + (mouse[0]+670) + "px;top:" + (mouse[1]+60) + "px")
-                  .html("test")
+                  .attr("style", "left:" + (mouse[0]+30) + "px;top:" + (mouse[1]-10) + "px")
+                  .html(d.properties.ZCTA5CE10)
               })
               .on("mouseout",  function(d,i) {
                 tooltip.classed("hidden", true)
