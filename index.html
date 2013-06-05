@@ -56,7 +56,6 @@
       }
 
       .active {
-        stroke: black;
         stroke-width: 1.5px;
       }
 
@@ -68,6 +67,10 @@
         fill: none;
         stroke: #424242;
         stroke-width: 1.2px;
+      }
+
+      .bold {
+        font-weight: bold;
       }
 
    </style>
@@ -142,6 +145,7 @@
         function updateSlider(slideAmount) {
             var display = document.getElementById("chosen");
             display.innerHTML=slideAmount;
+            return slideAmount;
         }
 
 
@@ -198,6 +202,8 @@
             var amtByZip = new Object();
             var townByZip = {};
             var contByZip = {};
+
+            donation = donation.filter(function(d) { return d.year == '2000' });
 
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
             donation.forEach(function(d) { townByZip[d.zip] = d.town });
@@ -350,7 +356,7 @@
                   .attr("id", function(data, index) { console.log(donation.town); })
                   //.html(d.properties.ZCTA5CE10)
                   .html(
-                    "Town: " + townByZip[d.properties.ZCTA5CE10] + 
+                    "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
                     "<br />Zip: " + d.properties.ZCTA5CE10 +
                     "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
                     "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10]
