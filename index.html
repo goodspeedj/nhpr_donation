@@ -240,6 +240,7 @@
               .enter().append("path")
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
+                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
 
             // paints the state border
             g_nh.append("path")
@@ -366,7 +367,20 @@
                 tooltip.classed("hidden", true)
               });
 
-          }   
+          }  
+
+
+          function redraw(error, map, donation) {
+            g_nh.selectAll(".town")
+                .data(topojson.feature(map, map.objects.g_nh).features)
+              .transition()
+                .duration(1000)
+                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
+                .attr("d", path)
+                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+
+
+          } 
 
    </script>
 
