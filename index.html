@@ -56,14 +56,18 @@
       }
 
       .active {
-        fill: #DE2D26;
+        stroke: black;
+        stroke-width: 1.5px;
+      }
+
+      .inactive {
+        fill-opacity: .8;
       }
 
       .boundary {
         fill: none;
-        /*stroke: #424242;*/
-        stroke: blue;
-        stroke-width: 1px;
+        stroke: #424242;
+        stroke-width: 1.2px;
       }
 
    </style>
@@ -137,6 +141,7 @@
           g.selectAll(".active").classed("active", false);
 
           // highlights (fills) the country clicked
+          //d3.selectAll(".town").classed("inactive", true);
           d3.select(this).classed("active", active = d);
 
           var centroid = path.centroid(d);
@@ -146,6 +151,7 @@
 
           g.transition()
               .duration(1000)
+              .attr("class", "inactive")
               .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
               //.style("stroke-width", 1.5 / k + "px");
        
@@ -156,6 +162,7 @@
         function reset() {
 
           g.selectAll(".active").classed("active", active = false);
+          g.selectAll(".inactive").classed("inactive", inactive = false);
           g.transition().duration(750).attr("transform", "translate(0,0)");;
           g.selectAll(".town")
               .transition()
@@ -195,7 +202,7 @@
 
             // paints the state border
             g_vt.append("path")
-                .datum(topojson.mesh(map, map.objects.g_vermont, function(a, b) { return a === b; }))
+                .datum(topojson.mesh(map, map.objects.g_vermont, function(a, b) { return a === b }))
                 .attr("class", "boundary")
                 .attr("d", path);
 
@@ -216,9 +223,9 @@
             // paints the state border
             g_nh.append("path")
                 .datum(topojson.mesh(map, map.objects.g_nh, function(a, b) { 
-                    return a !== b && a === b
+                    return a === b &&
 
-                           /* don't display boundry lines on the interior (ie: lakes)
+                           // don't display boundry lines on the interior (ie: lakes)
                           (a.properties.ZCTA5CE10 !== "03215" &&
                            a.properties.ZCTA5CE10 !== "03285" &&
                            a.properties.ZCTA5CE10 !== "03251" &&
@@ -228,9 +235,13 @@
                            a.properties.ZCTA5CE10 !== "03818" &&
                            a.properties.ZCTA5CE10 !== "03838" &&
                            a.properties.ZCTA5CE10 !== "03570" &&
-                           a.properties.ZCTA5CE10 !== "03583" ||
-                           a !== b)
-                          */
+                           a.properties.ZCTA5CE10 !== "03583" &&
+                           a.properties.ZCTA5CE10 !== "03581" &&
+                           a.properties.ZCTA5CE10 !== "03582" &&
+                           a.properties.ZCTA5CE10 !== "03584" &&
+                           a.properties.ZCTA5CE10 !== "03588" 
+                           )
+                          
                   }))
                 .attr("class", "boundary")
                 .attr("d", path);
@@ -283,7 +294,20 @@
 
              // paints the state border
             g_ma.append("path")
-                .datum(topojson.mesh(map, map.objects.g_mass, function(a, b) { return a === b; }))
+                .datum(topojson.mesh(map, map.objects.g_mass, function(a, b) { 
+                    return a === b &&
+
+                           // don't display boundry lines on the interior (ie: lakes)
+                           a.properties.ZCTA5CE10 !== "01366" &&
+                           a.properties.ZCTA5CE10 !== "01355" && 
+                           a.properties.ZCTA5CE10 !== "01331" && 
+                           a.properties.ZCTA5CE10 !== "01368" && 
+                           a.properties.ZCTA5CE10 !== "01523" && 
+                           a.properties.ZCTA5CE10 !== "01467" && 
+                           a.properties.ZCTA5CE10 !== "01434" && 
+                           a.properties.ZCTA5CE10 !== "01451" 
+
+                  }))
                 .attr("class", "boundary")
                 .attr("d", path);
 
