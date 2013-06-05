@@ -81,6 +81,14 @@
  <body>
 
    <div id="map"></div>
+   <div id="slider">
+      1999
+      <input id="slide" type="range"
+       min="1999" max="2012" step="1" value="2012"
+       onchange="updateSlider(this.value)" />
+      2012
+  </div>
+  <div id="chosen">2012</div>
 
    <script type="text/javascript">
        
@@ -129,6 +137,12 @@
         var g_me = g.append("g");
         var g_nh = g.append("g");
         var g_vt = g.append("g");
+
+
+        function updateSlider(slideAmount) {
+            var display = document.getElementById("chosen");
+            display.innerHTML=slideAmount;
+        }
 
 
         // function to zoom in on a country in the map by user click
@@ -182,11 +196,12 @@
 
             var zipById = {};
             var amtByZip = new Object();
+            var townByZip = {};
+            var contByZip = {};
 
-            //zip.forEach(function(d) { zipById[d.id] = +d.zip.toString(); });
-            //zip.forEach(function(d) { zipById[d.id] = +d.amt; });
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
-
+            donation.forEach(function(d) { townByZip[d.zip] = d.town });
+            donation.forEach(function(d) { contByZip[d.zip] = d.contrib });
 
             /*
              * Vermont
@@ -210,7 +225,7 @@
             /*
              * New Hampshire
              */
-            var nhTowns = topojson.feature(map, map.objects.g_nh.geometries);
+            //var nhTowns = topojson.feature(map, map.objects.g_nh.geometries); //works
             //var nhTowns = topojson.feature(map, map.objects.g_nh).geometries;
 
             g_nh.attr("class", "new_hamp")
@@ -332,7 +347,14 @@
                 tooltip
                   .classed("hidden", false)
                   .attr("style", "left:" + (mouse[0]+30) + "px;top:" + (mouse[1]-10) + "px")
-                  .html(d.properties.ZCTA5CE10)
+                  .attr("id", function(data, index) { console.log(donation.town); })
+                  //.html(d.properties.ZCTA5CE10)
+                  .html(
+                    "Town: " + townByZip[d.properties.ZCTA5CE10] + 
+                    "<br />Zip: " + d.properties.ZCTA5CE10 +
+                    "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
+                    "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10]
+                  )
               })
               .on("mouseout",  function(d,i) {
                 tooltip.classed("hidden", true)
