@@ -56,11 +56,11 @@
       }
 
       .active {
-        stroke-width: 1.5px;
+        fill-opacity: 1.5;
       }
 
       .inactive {
-        fill-opacity: .8;
+        fill-opacity: .5;
       }
 
       .boundary {
@@ -158,9 +158,12 @@
           // clicking a second country while zoomed in will de-activate (un-highlight) the first
           g.selectAll(".active").classed("active", false);
 
-          // highlights (fills) the country clicked
-          //d3.selectAll(".town").classed("inactive", true);
-          d3.select(this).classed("active", active = d);
+
+          // highlights (fills) the country clicked and zooms out when clicked again
+          d3.selectAll(".town").classed("inactive", true);
+          d3.select(this)
+              .classed("active", active = d)
+              .classed("inactive", false);
 
           var centroid = path.centroid(d);
           var x = centroid[0];
@@ -169,7 +172,7 @@
 
           g.transition()
               .duration(1000)
-              .attr("class", "inactive")
+              .attr("class", "active")
               .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
               //.style("stroke-width", 1.5 / k + "px");
        
