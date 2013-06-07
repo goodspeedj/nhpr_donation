@@ -98,8 +98,6 @@
 
         var width = 550;
         var height = 770;
-        //var width = 1000;
-        //var height = 2000;
         var active;
 
         var tooltip = d3.select("#map").append("div")
@@ -141,12 +139,6 @@
         var g_nh = g.append("g");
         var g_vt = g.append("g");
 
-
-        function updateSlider(slideAmount) {
-            var display = document.getElementById("chosen");
-            display.innerHTML=slideAmount;
-            return slideAmount;
-        }
 
 
         // function to zoom in on a country in the map by user click
@@ -198,15 +190,26 @@
           .defer(d3.csv, "data/test.csv")
           .await(ready);
 
+
+
+        function updateSlider(slideAmount) {
+            var display = document.getElementById("chosen");
+            display.innerHTML=slideAmount;
+            //redraw();
+            return slideAmount;
+        }
+
+
+
         //function ready(error, map, zip, donation) {
         function ready(error, map, donation) {
 
-            var zipById = {};
+            //var zipById = {};
             var amtByZip = new Object();
             var townByZip = {};
             var contByZip = {};
 
-            donation = donation.filter(function(d) { return d.year == '2000' });
+            donation = donation.filter(function(d) { return d.year == updateSlider() });
 
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
             donation.forEach(function(d) { townByZip[d.zip] = d.town });
@@ -373,14 +376,30 @@
           }  
 
 
+
           function redraw(error, map, donation) {
+
+            var year = document.getElementById("chosen");
+
+            var amtByZip = new Object();
+            var townByZip = {};
+            var contByZip = {};
+
+            donation = donation.filter(function(d) { return d.year == year });
+
+            donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
+            donation.forEach(function(d) { townByZip[d.zip] = d.town });
+            donation.forEach(function(d) { contByZip[d.zip] = d.contrib });
+
             g_nh.selectAll(".town")
                 .data(topojson.feature(map, map.objects.g_nh).features)
-              .transition()
-                .duration(1000)
+              //.transition()
+                //.duration(1000)
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
                 .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+
+            g_nh.exit().remove();
 
 
           } 
