@@ -2,7 +2,7 @@
 <html>
  <head>
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-
+   <link type="text/css" rel="stylesheet" href="css/colorbrewer.css"/>
    <style>
 
         #mapbg {
@@ -79,6 +79,7 @@
    <script src="js/d3.v3.min.js" charset="utf-8"></script>
    <script src="js/queue.v1.min.js" charset="utf-8"></script>
    <script src="js/topojson.v1.min.js" charset="utf-8"></script>
+   <script src="js/colorbrewer.js" charset="utf-8"></script>
 
  </head>
  <body>
@@ -88,10 +89,10 @@
       1999
       <input id="slide" type="range"
        min="1999" max="2012" step="1" value="2012"
-       onchange="updateSlider(this.value)" />
+       onchange="filter(this.value)" />
       2012
   </div>
-  <div id="chosen">2012</div>
+  <div id="year">2012</div>
 
    <script type="text/javascript">
        
@@ -107,10 +108,20 @@
             .domain([10, 500])
             .range(["white", "#006600"]);
 
-
-        var color = d3.scale.threshold()
+        /*
+        var color = d3.scale.quantile()
             .domain([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000])
             .range(["#FFFFFF", "#F7FCFD", "#E5F5F9", "#CCECE6", "#99D8C9", "#66C2A4", "#41AE76", "#238B45", "#006D2C", "#00441B", "#002900"]);
+        */
+        
+        
+
+        
+        var color = d3.scale.quantile()
+            .domain([250, 500, 1000, 2000, 3000, 4000, 5000, 10000, 20000, 30000])
+            .range(colorbrewer.Greens[9]);
+        
+        
 
 
         var projection = d3.geo.albers()
@@ -184,19 +195,28 @@
         }
 
 
+
         queue()
           .defer(d3.json, "data/ne-map10pct.json")
           //.defer(d3.csv, "data/id-zip.csv")
-          .defer(d3.csv, "data/test.csv")
+          .defer(d3.csv, "data/data.csv")
           .await(ready);
 
 
 
         function updateSlider(slideAmount) {
-            var display = document.getElementById("chosen");
+            var display = document.getElementById("year");
             display.innerHTML=slideAmount;
             //redraw();
             return slideAmount;
+        }
+
+
+
+        function filter(slideValue) {
+          var year = document.getElementById("year");
+          year.innerHTML=slideValue;
+          //data = 
         }
 
 
@@ -209,7 +229,9 @@
             var townByZip = {};
             var contByZip = {};
 
-            donation = donation.filter(function(d) { return d.year == updateSlider() });
+            //filter(donation);
+
+            donation = donation.filter(function(d) { return d.year == 2011 });
 
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
             donation.forEach(function(d) { townByZip[d.zip] = d.town });
@@ -233,6 +255,8 @@
                 .attr("class", "boundary")
                 .attr("d", path);
 
+            //g_vt.exit().remove();
+
 
             /*
              * New Hampshire
@@ -246,7 +270,7 @@
               .enter().append("path")
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+                .style("fill", function(d, i) { console.log(amtByZip[d.properties.ZCTA5CE10]); return color(amtByZip[d.properties.ZCTA5CE10]); });
 
             // paints the state border
             g_nh.append("path")
@@ -273,6 +297,8 @@
                   }))
                 .attr("class", "boundary")
                 .attr("d", path);
+
+            //g_nh.exit().remove();
 
 
             /*
@@ -308,6 +334,8 @@
                 .attr("class", "boundary")
                 .attr("d", path);
 
+            //g_me.exit().remove();
+
 
             /*
              * Massachusetts
@@ -338,6 +366,8 @@
                   }))
                 .attr("class", "boundary")
                 .attr("d", path);
+
+            //g_ma.exit().remove();
 
 
             var town = g.selectAll(".town").on("click", click);
