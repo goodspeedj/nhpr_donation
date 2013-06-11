@@ -44,7 +44,7 @@
       }
 
       .town {
-        fill: #ccc;
+        fill: #CCCCCC;
         stroke: gray;
         stroke-width: .5px;
         stroke-linejoin: round;
@@ -118,8 +118,9 @@
 
         
         var color = d3.scale.quantile()
-            .domain([250, 500, 1000, 2000, 3000, 4000, 5000, 10000, 20000, 30000])
-            .range(colorbrewer.Greens[9]);
+            .domain([500, 1000, 2500, 5000, 7500, 10000, 25000, 50000, 100000, 200000])
+            //.range(colorbrewer.Set3[9]);
+            .range(colorbrewer.Greens[8]);
         
         
 
@@ -247,7 +248,14 @@
                 // Adds the zip code as a class of the path
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+                .style("fill", function(d, i) { 
+                  if(!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    }
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]); 
+                    } 
+                  });
 
             // paints the state border
             g_vt.append("path")
@@ -270,7 +278,14 @@
               .enter().append("path")
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { console.log(amtByZip[d.properties.ZCTA5CE10]); return color(amtByZip[d.properties.ZCTA5CE10]); });
+                .style("fill", function(d, i) { 
+                  if(!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    }
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]); 
+                    } 
+                  });
 
             // paints the state border
             g_nh.append("path")
@@ -311,7 +326,14 @@
                 // Adds the zip code as a class of the path
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+                .style("fill", function(d, i) { 
+                    if(!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    }
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]); 
+                    }
+                });
 
             // paints the state border
             g_me.append("path")
@@ -346,7 +368,14 @@
               .enter().append("path")
                 .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                 .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+                .style("fill", function(d, i) { 
+                  if(!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    }
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]); 
+                    } 
+                  });
 
              // paints the state border
             g_ma.append("path")
