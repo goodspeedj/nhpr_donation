@@ -88,8 +88,7 @@
    <div id="slider">
       1999
       <input id="slide" type="range"
-       min="1999" max="2012" step="1" value="2012"
-       onchange="filter(this.value)" />
+       min="1999" max="2012" step="1" value="2012" />
       2012
   </div>
   <div id="year">2012</div>
@@ -196,10 +195,9 @@
         }
 
 
-
+ 
         queue()
           .defer(d3.json, "data/ne-map10pct.json")
-          //.defer(d3.csv, "data/id-zip.csv")
           .defer(d3.csv, "data/data.csv")
           .await(ready);
 
@@ -213,12 +211,29 @@
         }
 
 
-
+        /*
         function filter(slideValue) {
-          var year = document.getElementById("year");
-          year.innerHTML=slideValue;
-          //data = 
+
+          //var donation = d3.csv("data/data.csv");
+          //donation = donation.filter(function(d) { return d.year == slideValue });
+
+          var donation = d3.csv("data/data.csv", function(csv) {
+              csv = csv.filter(function(row) {
+                  return row['year'] == slideValue;
+              })
+          });
+
+          console.log(donation);
+
+          queue()
+            .defer(d3.json, "data/ne-map10pct.json")
+            //.defer(d3.csv, "data/id-zip.csv")
+            .defer(donation)
+            .await(ready);
+
+          
         }
+        */
 
 
 
@@ -232,7 +247,7 @@
 
             //filter(donation);
 
-            donation = donation.filter(function(d) { return d.year == 2011 });
+            donation = donation.filter(function(d) { return d.year == 2012 });
 
             donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
             donation.forEach(function(d) { townByZip[d.zip] = d.town });
@@ -436,33 +451,76 @@
 
 
 
-          function redraw(error, map, donation) {
+          function redraw(year) {
 
-            var year = document.getElementById("chosen");
+            
 
             var amtByZip = new Object();
             var townByZip = {};
             var contByZip = {};
+            var filter;
 
-            donation = donation.filter(function(d) { return d.year == year });
+            var all = d3.csv("data/data.csv", function(csv) {
+              filter = csv.filter(function(row) {
+                  return row['year'] == year;
+              })
+              console.log(filter);
+              console.log(filter[0]);
+              console.log(filter[0].town);
 
-            donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
-            donation.forEach(function(d) { townByZip[d.zip] = d.town });
-            donation.forEach(function(d) { contByZip[d.zip] = d.contrib });
+              for (var i=0; i < filter.length; i++) {
+                  console.log(filter[i].zip + ": " + filter[i].amt);
+                  amtByZip[filter[i].zip] = +filter[i].amt
+              }
 
-            g_nh.selectAll(".town")
-                .data(topojson.feature(map, map.objects.g_nh).features)
-              //.transition()
-                //.duration(1000)
-                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
-                .attr("d", path)
-                .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
 
-            g_nh.exit().remove();
+              d3.json("data/ne-map10pct.json", function(map) {
+                var test = g_vt.selectAll("vermont")
+                    .data(topojson.feature(map, map.objects.g_vermont).features)
+                  .enter().append("path")
+                    // Adds the zip code as a class of the path
+                    .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
+                    .attr("d", path)
+                    //.style("fill", "red");
+                    
+                    .style("fill", function(d, i) { 
+                      if(!amtByZip[d.properties.ZCTA5CE10]) {
+                          return "#D8D8D8";
+                        }
+                        else {
+                          return color(amtByZip[d.properties.ZCTA5CE10]); 
+                        } 
+                      });
+                    
+
+                //test.exit().remove();
+              })
+
+
+              
+
+            });
+
+            //all.exit().remove();
+
+            
+
+            //donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
+            //donation.forEach(function(d) { townByZip[d.zip] = d.town });
+            //donation.forEach(function(d) { contByZip[d.zip] = d.contrib });
+
+
+            
 
 
           } 
 
+
+          d3.select("#slide").on("change", function() { 
+              console.log(this.value);
+              redraw(this.value);
+
+          });
    </script>
 
  </body>
