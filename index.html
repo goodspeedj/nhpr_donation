@@ -10,18 +10,23 @@
           pointer-events: all;
         }
 
+        
        path {
          stroke: #000000;
          stroke-width: 0.25px;
-         fill: gray;
+         fill: none;
        }
 
+
+       /*
        .states {
          fill: none;
          stroke: #fff;
          stroke-linejoin: round;
        }
+       */
 
+       /*
        .subunit-label {
          fill: #777;
          fill-opacity: .5;
@@ -29,6 +34,7 @@
          font-weight: 300;
          text-anchor: middle;
        }
+       */
 
        div.tooltip {
         color: #222; 
@@ -44,7 +50,7 @@
       }
 
       .town {
-        fill: #CCCCCC;
+        fill: #CCCCCC; 
         stroke: gray;
         stroke-width: .5px;
         stroke-linejoin: round;
@@ -469,20 +475,21 @@
               console.log(filter[0].town);
 
               for (var i=0; i < filter.length; i++) {
-                  console.log(filter[i].zip + ": " + filter[i].amt);
+                  //console.log(filter[i].zip + ": " + filter[i].amt);
                   amtByZip[filter[i].zip] = +filter[i].amt
               }
 
 
               d3.json("data/ne-map10pct.json", function(map) {
-                var test = g_vt.selectAll("vermont")
+                g_vt.selectAll("vermont")
                     .data(topojson.feature(map, map.objects.g_vermont).features)
                   .enter().append("path")
                     // Adds the zip code as a class of the path
                     .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
                     .attr("d", path)
                     //.style("fill", "red");
-                    
+                    .transition()
+                      .duration(1000)
                     .style("fill", function(d, i) { 
                       if(!amtByZip[d.properties.ZCTA5CE10]) {
                           return "#D8D8D8";
@@ -491,26 +498,42 @@
                           return color(amtByZip[d.properties.ZCTA5CE10]); 
                         } 
                       });
+
+                g_nh.selectAll("new_hamp")
+                    .data(topojson.feature(map, map.objects.g_nh).features)
+                  .enter().append("path")
+                    // Adds the zip code as a class of the path
+                    .attr("class", function(d) { return d.properties.ZCTA5CE10; })
+                    .attr("d", path)
+                    //.style("fill", "red");
+                    .transition()
+                      .duration(1000)
+                    .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
+                    /*
+                    .style("fill", function(d, i) { 
+                      if(!amtByZip[d.properties.ZCTA5CE10]) {
+                          return "#D8D8D8";
+                        }
+                        else {
+                          return color(amtByZip[d.properties.ZCTA5CE10]); 
+                        } 
+                      });
+                    */
+                    // .exit().remove(); //error
                     
 
-                //test.exit().remove();
+                //filter.exit().remove(); //error
+                // g_nh.exit().remove();  // error
               })
 
+              //filter.exit().remove(); //error
 
               
 
             });
 
-            //all.exit().remove();
-
-            
-
-            //donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
-            //donation.forEach(function(d) { townByZip[d.zip] = d.town });
-            //donation.forEach(function(d) { contByZip[d.zip] = d.contrib });
-
-
-            
+            //filter.exit().remove();  // error
+            // all.exit().remove();  // error
 
 
           } 
