@@ -6,7 +6,8 @@
    <style>
 
         #mapbg {
-          fill: none;
+          fill: none; 
+          fill-opacity: 0;
           pointer-events: all;
         }
 
@@ -50,7 +51,8 @@
       }
 
       .town {
-        fill: #CCCCCC; 
+        fill: #CCCCCC;
+        /*fill-opacity: 0;*/
         stroke: gray;
         stroke-width: .5px;
         stroke-linejoin: round;
@@ -489,7 +491,7 @@
                     .attr("d", path)
                     //.style("fill", "red");
                     .transition()
-                      .duration(1000)
+                      .duration(3000)
                     .style("fill", function(d, i) { 
                       if(!amtByZip[d.properties.ZCTA5CE10]) {
                           return "#D8D8D8";
@@ -503,11 +505,14 @@
                     .data(topojson.feature(map, map.objects.g_nh).features)
                   .enter().append("path")
                     // Adds the zip code as a class of the path
-                    .attr("class", function(d) { return d.properties.ZCTA5CE10; })
+                    .attr("class", function(d) { return d.properties.ZCTA5CE10; + " town"})
                     .attr("d", path)
-                    //.style("fill", "red");
+                    .style("fill-opacity", 0)
+                    .style("fill", "white")
+                    
                     .transition()
-                      .duration(1000)
+                      .duration(5000)
+                    .style("fill-opacity", 1)
                     .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
                     /*
                     .style("fill", function(d, i) { 
