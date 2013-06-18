@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
- <head>
-   <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-   <link type="text/css" rel="stylesheet" href="css/colorbrewer.css"/>
-   <style>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="css/colorbrewer.css"/>
+    <link type="text/css" rel="stylesheet" href="css/table.css"/>
+    <link type="text/css" rel="stylesheet" href="css/slick.grid.css"/>
+    <link type="text/css" rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css"/>
+    <style>
 
         #mapbg {
           fill: none; 
@@ -81,28 +84,35 @@
         font-weight: bold;
       }
 
-   </style>
+  </style>
 
-   <!-- D3 Libraries -->
-   <script src="js/d3.v3.min.js" charset="utf-8"></script>
-   <script src="js/queue.v1.min.js" charset="utf-8"></script>
-   <script src="js/topojson.v1.min.js" charset="utf-8"></script>
-   <script src="js/colorbrewer.js" charset="utf-8"></script>
+  <!-- D3 Libraries -->
+  <script src="js/d3.v3.min.js" charset="utf-8"></script>
+  <script src="js/queue.v1.min.js" charset="utf-8"></script>
+  <script src="js/topojson.v1.min.js" charset="utf-8"></script>
+  <script src="js/colorbrewer.js" charset="utf-8"></script>
+  <script src="js/colorbrewer.js" charset="utf-8"></script>
+  <script src="js/jquery-1.10.1.min.js" charset="utf-8"></script>
+  <script src="js/jquery.event.drag-2.2.js" charset="utf-8"></script>
+  <script src="js/slick.core.js" charset="utf-8"></script>
+  <script src="js/slick.grid.js" charset="utf-8"></script>
+
 
  </head>
  <body>
 
-   <div id="map"></div>
-   <div id="slider">
-      1999
-      <input id="slide" type="range"
-       min="1999" max="2012" step="1" value="2012" />
-      2012
+  <div id="map"></div>
+
+  <div id="slider">
+    1999 <input id="slide" type="range" min="1999" max="2012" step="1" value="2012" /> 2012
   </div>
+
   <div id="year">2012</div>
 
-   <script type="text/javascript">
-       
+  <div id="table" style="width:600px;height:500px;"></div>
+
+
+  <script type="text/javascript">
 
         var width = 550;
         var height = 770;
@@ -111,7 +121,7 @@
         var tooltip = d3.select("#map").append("div")
             .attr("class", "tooltip");
 
-        var fill = d3.scale.log()
+        var fill = d3.scale.quantile()
             .domain([10, 500])
             .range(["white", "#006600"]);
 
@@ -157,6 +167,11 @@
         var g_me = g.append("g");
         var g_nh = g.append("g");
         var g_vt = g.append("g");
+
+        var amtByZip = new Object();
+            var townByZip = {};
+            var contByZip = {};
+
 
 
 
@@ -219,40 +234,48 @@
         }
 
 
-        /*
-        function filter(slideValue) {
 
-          //var donation = d3.csv("data/data.csv");
-          //donation = donation.filter(function(d) { return d.year == slideValue });
+        function tooltip() {
+                      var town = g.selectAll(".town").on("click", click);
 
-          var donation = d3.csv("data/data.csv", function(csv) {
-              csv = csv.filter(function(row) {
-                  return row['year'] == slideValue;
+            /*
+            nhTown
+             .enter()
+              .insert("path")
+              .attr("class", function(d,i) { return d.name + " country"; })   
+                .attr("title", function(d,i) { return d.name; })  // country name
+                .attr("d", path)
+                .on("click", click);
+                */
+
+            // Show/hide tooltip
+            town
+              .on("mousemove", function(d,i) {
+                var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
+
+                tooltip
+                  .classed("hidden", false)
+                  .attr("style", "left:" + (mouse[0]+30) + "px;top:" + (mouse[1]-10) + "px")
+                  //.attr("id", function(data, index) { console.log(donation.town); })
+                  //.html(d.properties.ZCTA5CE10)
+                  .html(
+                    "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
+                    "<br />Zip: " + d.properties.ZCTA5CE10 +
+                    "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
+                    "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10]
+                  )
               })
-          });
-
-          console.log(donation);
-
-          queue()
-            .defer(d3.json, "data/ne-map10pct.json")
-            //.defer(d3.csv, "data/id-zip.csv")
-            .defer(donation)
-            .await(ready);
-
-          
+              .on("mouseout",  function(d,i) {
+                tooltip.classed("hidden", true)
+              });
         }
-        */
-
 
 
         //function ready(error, map, zip, donation) {
         function ready(error, map, donation) {
 
             //var zipById = {};
-            var amtByZip = new Object();
-            var townByZip = {};
-            var contByZip = {};
-
+            
             //filter(donation);
 
             donation = donation.filter(function(d) { return d.year == 2012 });
@@ -422,7 +445,7 @@
             //g_ma.exit().remove();
 
 
-            var town = g.selectAll(".town").on("click", click);
+              var town = g.selectAll(".town").on("click", click);
 
             /*
             nhTown
@@ -442,7 +465,7 @@
                 tooltip
                   .classed("hidden", false)
                   .attr("style", "left:" + (mouse[0]+30) + "px;top:" + (mouse[1]-10) + "px")
-                  .attr("id", function(data, index) { console.log(donation.town); })
+                  //.attr("id", function(data, index) { console.log(donation.town); })
                   //.html(d.properties.ZCTA5CE10)
                   .html(
                     "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
@@ -454,6 +477,8 @@
               .on("mouseout",  function(d,i) {
                 tooltip.classed("hidden", true)
               });
+
+              slickGrid(donation);
 
           }  
 
@@ -468,13 +493,13 @@
             var contByZip = {};
             var filter;
 
-            var all = d3.csv("data/data.csv", function(csv) {
+            d3.csv("data/data.csv", function(csv) {
               filter = csv.filter(function(row) {
                   return row['year'] == year;
               })
-              console.log(filter);
-              console.log(filter[0]);
-              console.log(filter[0].town);
+
+
+              slickGrid(filter);
 
               for (var i=0; i < filter.length; i++) {
                   //console.log(filter[i].zip + ": " + filter[i].amt);
@@ -491,7 +516,7 @@
                     .attr("d", path)
                     //.style("fill", "red");
                     .transition()
-                      .duration(3000)
+                      .duration(100)
                     .style("fill", function(d, i) { 
                       if(!amtByZip[d.properties.ZCTA5CE10]) {
                           return "#D8D8D8";
@@ -511,7 +536,7 @@
                     .style("fill", "white")
                     
                     .transition()
-                      .duration(5000)
+                      .duration(100)
                     .style("fill-opacity", 1)
                     .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
                     /*
@@ -537,18 +562,44 @@
 
             });
 
+
+
             //filter.exit().remove();  // error
             // all.exit().remove();  // error
-
 
           } 
 
 
-          d3.select("#slide").on("change", function() { 
-              console.log(this.value);
-              redraw(this.value);
+          function slickGrid(data) {
 
+            console.log(data);
+              var grid;
+              var columns = [
+                {id: "year", name: "Year", field: "year"},
+                {id: "town", name: "Town", field: "town"},
+                {id: "state", name: "State", field: "state"},
+                {id: "zip", name: "Zip Code", field: "zip"},
+                {id: "signal", name: "Signal", field: "signal"},
+                {id: "amt", name: "Amount", field: "amt"},
+                {id: "contrib", name: "# Contributions", field: "contrib"}
+              ];
+
+              var options = {
+                enableCellNavigation: true,
+                enableColumnReorder: false
+              };
+
+              grid = new Slick.Grid("#table", data, columns, options);
+
+          }
+
+
+          d3.select("#slide").on("change", function() { 
+              redraw(this.value);
           });
+
+
+          
    </script>
 
  </body>
