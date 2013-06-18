@@ -554,6 +554,42 @@
 
                 //filter.exit().remove(); //error
                 // g_nh.exit().remove();  // error
+
+                g_ma.selectAll("mass")
+                    .data(topojson.feature(map, map.objects.g_mass).features)
+                  .enter().append("path")
+                    // Adds the zip code as a class of the path
+                    .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
+                    .attr("d", path)
+                    //.style("fill", "red");
+                    .transition()
+                      .duration(100)
+                    .style("fill", function(d, i) { 
+                      if(!amtByZip[d.properties.ZCTA5CE10]) {
+                          return "#D8D8D8";
+                        }
+                        else {
+                          return color(amtByZip[d.properties.ZCTA5CE10]); 
+                        } 
+                      });
+
+                g_me.selectAll("maine")
+                    .data(topojson.feature(map, map.objects.g_maine).features)
+                  .enter().append("path")
+                    // Adds the zip code as a class of the path
+                    .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
+                    .attr("d", path)
+                    //.style("fill", "red");
+                    .transition()
+                      .duration(100)
+                    .style("fill", function(d, i) { 
+                      if(!amtByZip[d.properties.ZCTA5CE10]) {
+                          return "#D8D8D8";
+                        }
+                        else {
+                          return color(amtByZip[d.properties.ZCTA5CE10]); 
+                        } 
+                      });
               })
 
               //filter.exit().remove(); //error
@@ -561,6 +597,8 @@
               
 
             });
+
+
 
 
 
