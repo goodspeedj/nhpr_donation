@@ -2,159 +2,78 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+
+    <link type="text/css" rel="stylesheet" href="css/main.css"/>
     <link type="text/css" rel="stylesheet" href="css/colorbrewer.css"/>
     <link type="text/css" rel="stylesheet" href="css/table.css"/>
     <link type="text/css" rel="stylesheet" href="css/slick.grid.css"/>
     <link type="text/css" rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css"/>
-    <style>
+    
+    <!-- D3 Libraries -->
+    <script src="js/d3.v3.min.js" charset="utf-8"></script>
+    <script src="js/queue.v1.min.js" charset="utf-8"></script>
+    <script src="js/topojson.v1.min.js" charset="utf-8"></script>
+    <script src="js/colorbrewer.js" charset="utf-8"></script>
+    <script src="js/colorbrewer.js" charset="utf-8"></script>
+    <script src="js/jquery-1.10.1.min.js" charset="utf-8"></script>
+    <script src="js/jquery.event.drag-2.2.js" charset="utf-8"></script>
+    <script src="js/slick.core.js" charset="utf-8"></script>
+    <script src="js/slick.grid.js" charset="utf-8"></script>
 
-        #mapbg {
-          fill: none; 
-          fill-opacity: 0;
-          pointer-events: all;
-        }
+  </head>
+  <body>
 
-        
-       path {
-         stroke: #000000;
-         stroke-width: 0.25px;
-         fill: none;
-       }
+    <div id="map"></div>
 
+    <div id="slider">
+      1999 <input id="slide" type="range" min="1999" max="2012" step="1" value="2012" /> 2012
+    </div>
 
-       /*
-       .states {
-         fill: none;
-         stroke: #fff;
-         stroke-linejoin: round;
-       }
-       */
+    <div id="year">2012</div>
 
-       /*
-       .subunit-label {
-         fill: #777;
-         fill-opacity: .5;
-         font-size: 20px;
-         font-weight: 300;
-         text-anchor: middle;
-       }
-       */
-
-       div.tooltip {
-        color: #222; 
-        font-size: 11px;
-        font-family: sans-serif;
-        background: #fff; 
-        padding: .5em; 
-        text-shadow: #f5f5f5 0 1px 0;
-        border-radius: 2px; 
-        box-shadow: 0px 0px 2px 0px #a6a6a6; 
-        opacity: .86; 
-        position: absolute;
-      }
-
-      .town {
-        fill: #CCCCCC;
-        /*fill-opacity: 0;*/
-        stroke: gray;
-        stroke-width: .5px;
-        stroke-linejoin: round;
-        cursor: pointer;
-      }
-
-      .hidden { 
-        display: none; 
-      }
-
-      .active {
-        fill-opacity: 1.5;
-      }
-
-      .inactive {
-        fill-opacity: .5;
-      }
-
-      .boundary {
-        fill: none;
-        stroke: #424242;
-        stroke-width: 1.2px;
-      }
-
-      .bold {
-        font-weight: bold;
-      }
-
-  </style>
-
-  <!-- D3 Libraries -->
-  <script src="js/d3.v3.min.js" charset="utf-8"></script>
-  <script src="js/queue.v1.min.js" charset="utf-8"></script>
-  <script src="js/topojson.v1.min.js" charset="utf-8"></script>
-  <script src="js/colorbrewer.js" charset="utf-8"></script>
-  <script src="js/colorbrewer.js" charset="utf-8"></script>
-  <script src="js/jquery-1.10.1.min.js" charset="utf-8"></script>
-  <script src="js/jquery.event.drag-2.2.js" charset="utf-8"></script>
-  <script src="js/slick.core.js" charset="utf-8"></script>
-  <script src="js/slick.grid.js" charset="utf-8"></script>
+    <div id="table" style="width:600px;height:500px;"></div>
 
 
- </head>
- <body>
-
-  <div id="map"></div>
-
-  <div id="slider">
-    1999 <input id="slide" type="range" min="1999" max="2012" step="1" value="2012" /> 2012
-  </div>
-
-  <div id="year">2012</div>
-
-  <div id="table" style="width:600px;height:500px;"></div>
-
-
-  <script type="text/javascript">
+    <script type="text/javascript">
 
         var width = 550;
         var height = 770;
         var active;
 
         var tooltip = d3.select("#map").append("div")
-            .attr("class", "tooltip");
+          .attr("class", "tooltip");
 
         var fill = d3.scale.quantile()
-            .domain([10, 500])
-            .range(["white", "#006600"]);
+          .domain([10, 500])
+          .range(["white", "#006600"]);
 
         /*
         var color = d3.scale.quantile()
             .domain([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000])
             .range(["#FFFFFF", "#F7FCFD", "#E5F5F9", "#CCECE6", "#99D8C9", "#66C2A4", "#41AE76", "#238B45", "#006D2C", "#00441B", "#002900"]);
         */
-        
-        
 
-        
+
         var color = d3.scale.quantile()
-            .domain([500, 1000, 2500, 5000, 7500, 10000, 25000, 50000, 100000, 200000])
-            //.range(colorbrewer.Set3[9]);
-            .range(colorbrewer.Greens[8]);
-        
-        
+          .domain([500, 1000, 2500, 5000, 7500, 10000, 25000, 50000, 100000, 200000])
+           //.range(colorbrewer.Set3[9]);
+          .range(colorbrewer.Greens[8]);
 
 
         var projection = d3.geo.albers()
-            .center([0, 43.9])
-            .rotate([71.5, 0])
-            .parallels([50, 60])
-            .scale(15000)
-            .translate([width / 2, height / 2]);
+          .center([0, 43.9])
+          .rotate([71.5, 0])
+          .parallels([50, 60])
+          .scale(15000)
+          .translate([width / 2, height / 2]);
 
         var path = d3.geo.path()
-            .projection(projection);
+          .projection(projection);
 
         var svg = d3.select("#map").append("svg")
-            .attr("width", width)
-            .attr("height", height);
+          .attr("width", width)
+          .attr("height", height);
 
         svg.append("rect")
           .attr("width", width)
@@ -169,27 +88,27 @@
         var g_vt = g.append("g");
 
         var amtByZip = new Object();
-            var townByZip = {};
-            var contByZip = {};
+        var townByZip = {};
+        var contByZip = {};
 
 
+         // function to zoom in on a country in the map by user click
 
-
-        // function to zoom in on a country in the map by user click
         function click(d) {
 
           // if already active clicking will de-activate
           if (active === d) return reset();
-            
+
           // clicking a second country while zoomed in will de-activate (un-highlight) the first
           g.selectAll(".active").classed("active", false);
 
 
           // highlights (fills) the country clicked and zooms out when clicked again
           d3.selectAll(".town").classed("inactive", true);
+
           d3.select(this)
-              .classed("active", active = d)
-              .classed("inactive", false);
+            .classed("active", active = d)
+            .classed("inactive", false);
 
           var centroid = path.centroid(d);
           var x = centroid[0];
@@ -197,349 +116,347 @@
           var k = 4;
 
           g.transition()
-              .duration(1000)
-              .attr("class", "active")
-              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
-              //.style("stroke-width", 1.5 / k + "px");
-       
+            .duration(1000)
+            .attr("class", "active")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
+            //.style("stroke-width", 1.5 / k + "px");
+
         }
 
 
-        // zooms the map back out
+         // zooms the map back out
+
         function reset() {
 
           g.selectAll(".active").classed("active", active = false);
           g.selectAll(".inactive").classed("inactive", inactive = false);
           g.transition().duration(750).attr("transform", "translate(0,0)");;
           g.selectAll(".town")
-              .transition()
-                .duration(750);
-              //.style("stroke-width", ".5px");
+            .transition()
+            .duration(750);
+            //.style("stroke-width", ".5px");
         }
 
 
- 
         queue()
           .defer(d3.json, "data/ne-map10pct.json")
           .defer(d3.csv, "data/data.csv")
           .await(ready);
 
 
-
         function updateSlider(slideAmount) {
-            var display = document.getElementById("year");
-            display.innerHTML=slideAmount;
-            //redraw();
-            return slideAmount;
+          var display = document.getElementById("year");
+          display.innerHTML = slideAmount;
+          //redraw();
+          return slideAmount;
         }
-
 
 
         function tooltip() {
-                      var town = g.selectAll(".town").on("click", click);
+          var town = g.selectAll(".town").on("click", click);
 
-            /*
-            nhTown
-             .enter()
-              .insert("path")
-              .attr("class", function(d,i) { return d.name + " country"; })   
-                .attr("title", function(d,i) { return d.name; })  // country name
-                .attr("d", path)
-                .on("click", click);
-                */
+          // Show/hide tooltip
+          town
+            .on("mousemove", function(d, i) {
+            var mouse = d3.mouse(svg.node()).map(function(d) {
+              return parseInt(d);
+            });
 
-            // Show/hide tooltip
-            town
-              .on("mousemove", function(d,i) {
-                var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
+            tooltip
+              .classed("hidden", false)
+              .attr("style", "left:" + (mouse[0] + 30) + "px;top:" + (mouse[1] - 10) + "px")
+              //.attr("id", function(data, index) { console.log(donation.town); })
+              //.html(d.properties.ZCTA5CE10)
+              .html(
+                "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
+                "<br />Zip: " + d.properties.ZCTA5CE10 +
+                "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
+                "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10])
+            })
 
-                tooltip
-                  .classed("hidden", false)
-                  .attr("style", "left:" + (mouse[0]+30) + "px;top:" + (mouse[1]-10) + "px")
-                  //.attr("id", function(data, index) { console.log(donation.town); })
-                  //.html(d.properties.ZCTA5CE10)
-                  .html(
-                    "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
-                    "<br />Zip: " + d.properties.ZCTA5CE10 +
-                    "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
-                    "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10]
-                  )
-              })
-              .on("mouseout",  function(d,i) {
-                tooltip.classed("hidden", true)
-              });
+            .on("mouseout", function(d, i) {
+              tooltip.classed("hidden", true)
+            });
         }
 
 
-        //function ready(error, map, zip, donation) {
+         //function ready(error, map, zip, donation) {
+
         function ready(error, map, donation) {
 
-            //var zipById = {};
-            
-            //filter(donation);
+          donation = donation.filter(function(d) {
+            return d.year == 2012
+          });
 
-            donation = donation.filter(function(d) { return d.year == 2012 });
+          donation.forEach(function(d) {
+            amtByZip[d.zip] = +d.amt
+          });
 
-            donation.forEach(function(d) { amtByZip[d.zip] = +d.amt });
-            donation.forEach(function(d) { townByZip[d.zip] = d.town });
-            donation.forEach(function(d) { contByZip[d.zip] = d.contrib });
+          donation.forEach(function(d) {
+            townByZip[d.zip] = d.town
+          });
 
-            /*
-             * Vermont
-             */
-            g_vt.attr("class", "vermont")
-              .selectAll("path")
+          donation.forEach(function(d) {
+            contByZip[d.zip] = d.contrib
+          });
+
+          /*
+           * Vermont
+           */
+          g_vt.attr("class", "vermont")
+            .selectAll("path")
+            .data(topojson.feature(map, map.objects.g_vermont).features)
+              .enter().append("path")
+            // Adds the zip code as a class of the path
+            .attr("class", function(d) {
+              return d.properties.ZCTA5CE10 + " town";
+            })
+            .attr("d", path)
+            .style("fill", function(d, i) {
+            if (!amtByZip[d.properties.ZCTA5CE10]) {
+              return "#D8D8D8";
+            } 
+            else {
+              return color(amtByZip[d.properties.ZCTA5CE10]);
+            }
+          });
+
+          // paints the state border
+          g_vt.append("path")
+            .datum(topojson.mesh(map, map.objects.g_vermont, function(a, b) {
+              return a === b
+            }))
+            .attr("class", "boundary")
+            .attr("d", path);
+
+          //g_vt.exit().remove();
+
+
+          /*
+           * New Hampshire
+           */
+          g_nh.attr("class", "new_hamp")
+            .selectAll("path")
+            .data(topojson.feature(map, map.objects.g_nh).features)
+              .enter().append("path")
+            .attr("class", function(d) {
+              return d.properties.ZCTA5CE10 + " town";
+            })
+            .attr("d", path)
+            .style("fill", function(d, i) {
+            if (!amtByZip[d.properties.ZCTA5CE10]) {
+              return "#D8D8D8";
+            } 
+            else {
+              return color(amtByZip[d.properties.ZCTA5CE10]);
+            }
+          });
+
+          // paints the state border
+          g_nh.append("path")
+            .datum(topojson.mesh(map, map.objects.g_nh, function(a, b) {
+              return a === b &&
+
+              // don't display boundry lines on the interior (ie: lakes)
+              (a.properties.ZCTA5CE10 !== "03215" &&
+                a.properties.ZCTA5CE10 !== "03285" &&
+                a.properties.ZCTA5CE10 !== "03251" &&
+                a.properties.ZCTA5CE10 !== "03812" &&
+                a.properties.ZCTA5CE10 !== "03593" &&
+                a.properties.ZCTA5CE10 !== "03575" &&
+                a.properties.ZCTA5CE10 !== "03818" &&
+                a.properties.ZCTA5CE10 !== "03838" &&
+                a.properties.ZCTA5CE10 !== "03570" &&
+                a.properties.ZCTA5CE10 !== "03583" &&
+                a.properties.ZCTA5CE10 !== "03581" &&
+                a.properties.ZCTA5CE10 !== "03582" &&
+                a.properties.ZCTA5CE10 !== "03584" &&
+                a.properties.ZCTA5CE10 !== "03588")
+
+            }))
+            .attr("class", "boundary")
+            .attr("d", path);
+
+          //g_nh.exit().remove();
+
+
+          /*
+           * Maine
+           */
+          g_me.attr("class", "maine")
+            .selectAll("path")
+            .data(topojson.feature(map, map.objects.g_maine).features)
+              .enter().append("path")
+            // Adds the zip code as a class of the path
+            .attr("class", function(d) {
+              return d.properties.ZCTA5CE10 + " town";
+            })
+            .attr("d", path)
+            .style("fill", function(d, i) {
+            if (!amtByZip[d.properties.ZCTA5CE10]) {
+              return "#D8D8D8";
+            } 
+            else {
+              return color(amtByZip[d.properties.ZCTA5CE10]);
+            }
+          });
+
+          // paints the state border
+          g_me.append("path")
+            .datum(topojson.mesh(map, map.objects.g_maine, function(a, b) {
+              return a === b &&
+
+                // don't display boundry lines on the interior (ie: lakes)
+                a.properties.ZCTA5CE10 !== "04084" &&
+                a.properties.ZCTA5CE10 !== "04029" &&
+                a.properties.ZCTA5CE10 !== "04055" &&
+                a.properties.ZCTA5CE10 !== "04015" &&
+                a.properties.ZCTA5CE10 !== "04071" &&
+                a.properties.ZCTA5CE10 !== "04062" &&
+                a.properties.ZCTA5CE10 !== "04982" &&
+                a.properties.ZCTA5CE10 !== "04936" &&
+                a.properties.ZCTA5CE10 !== "04961" &&
+                a.properties.ZCTA5CE10 !== "04945" &&
+                a.properties.ZCTA5CE10 !== "04985"
+            }))
+            .attr("class", "boundary")
+            .attr("d", path);
+
+          //g_me.exit().remove();
+
+
+          /*
+           * Massachusetts
+           */
+          g_ma.attr("class", "mass")
+            .selectAll("path")
+            .data(topojson.feature(map, map.objects.g_mass).features)
+              .enter().append("path")
+            .attr("class", function(d) {
+              return d.properties.ZCTA5CE10 + " town";
+            })
+            .attr("d", path)
+            .style("fill", function(d, i) {
+            if (!amtByZip[d.properties.ZCTA5CE10]) {
+              return "#D8D8D8";
+            } 
+            else {
+              return color(amtByZip[d.properties.ZCTA5CE10]);
+            }
+          });
+
+          // paints the state border
+          g_ma.append("path")
+            .datum(topojson.mesh(map, map.objects.g_mass, function(a, b) {
+              return a === b &&
+
+                // don't display boundry lines on the interior (ie: lakes)
+                a.properties.ZCTA5CE10 !== "01366" &&
+                a.properties.ZCTA5CE10 !== "01355" &&
+                a.properties.ZCTA5CE10 !== "01331" &&
+                a.properties.ZCTA5CE10 !== "01368" &&
+                a.properties.ZCTA5CE10 !== "01523" &&
+                a.properties.ZCTA5CE10 !== "01467" &&
+                a.properties.ZCTA5CE10 !== "01434" &&
+                a.properties.ZCTA5CE10 !== "01451"
+
+            }))
+            .attr("class", "boundary")
+            .attr("d", path);
+
+          //g_ma.exit().remove();
+
+
+          var town = g.selectAll(".town").on("click", click);
+
+          // Show/hide tooltip
+          town
+            .on("mousemove", function(d, i) {
+            var mouse = d3.mouse(svg.node()).map(function(d) {
+              return parseInt(d);
+            });
+
+            tooltip
+              .classed("hidden", false)
+              .attr("style", "left:" + (mouse[0] + 30) + "px;top:" + (mouse[1] - 10) + "px")
+              //.attr("id", function(data, index) { console.log(donation.town); })
+              //.html(d.properties.ZCTA5CE10)
+              .html(
+                "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
+                "<br />Zip: " + d.properties.ZCTA5CE10 +
+                "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
+                "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10])
+            })
+            .on("mouseout", function(d, i) {
+              tooltip.classed("hidden", true)
+            });
+
+          slickGrid(donation);
+
+        }
+
+
+        function redraw(year) {
+
+
+          var amtByZip = new Object();
+          var townByZip = {};
+          var contByZip = {};
+          var filter;
+
+          d3.csv("data/data.csv", function(csv) {
+            filter = csv.filter(function(row) {
+              return row['year'] == year;
+            })
+
+
+            slickGrid(filter);
+
+            for (var i = 0; i < filter.length; i++) {
+              //console.log(filter[i].zip + ": " + filter[i].amt);
+              amtByZip[filter[i].zip] = +filter[i].amt
+            }
+
+
+            d3.json("data/ne-map10pct.json", function(map) {
+              g_vt.selectAll("vermont")
                 .data(topojson.feature(map, map.objects.g_vermont).features)
-              .enter().append("path")
+                  .enter().append("path")
                 // Adds the zip code as a class of the path
-                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
+                .attr("class", function(d) {
+                  return d.properties.ZCTA5CE10 + " town";
+                })
                 .attr("d", path)
-                .style("fill", function(d, i) { 
-                  if(!amtByZip[d.properties.ZCTA5CE10]) {
+                //.style("fill", "red");
+                .transition()
+                  .duration(100)
+                  .style("fill", function(d, i) {
+                    if (!amtByZip[d.properties.ZCTA5CE10]) {
                       return "#D8D8D8";
-                    }
-                    else {
-                      return color(amtByZip[d.properties.ZCTA5CE10]); 
                     } 
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]);
+                    }
                   });
 
-            // paints the state border
-            g_vt.append("path")
-                .datum(topojson.mesh(map, map.objects.g_vermont, function(a, b) { return a === b }))
-                .attr("class", "boundary")
-                .attr("d", path);
-
-            //g_vt.exit().remove();
-
-
-            /*
-             * New Hampshire
-             */
-            //var nhTowns = topojson.feature(map, map.objects.g_nh.geometries); //works
-            //var nhTowns = topojson.feature(map, map.objects.g_nh).geometries;
-
-            g_nh.attr("class", "new_hamp")
-              .selectAll("path")
+              g_nh.selectAll("new_hamp")
                 .data(topojson.feature(map, map.objects.g_nh).features)
-              .enter().append("path")
-                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
-                .attr("d", path)
-                .style("fill", function(d, i) { 
-                  if(!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
-                    }
-                    else {
-                      return color(amtByZip[d.properties.ZCTA5CE10]); 
-                    } 
-                  });
-
-            // paints the state border
-            g_nh.append("path")
-                .datum(topojson.mesh(map, map.objects.g_nh, function(a, b) { 
-                    return a === b &&
-
-                           // don't display boundry lines on the interior (ie: lakes)
-                          (a.properties.ZCTA5CE10 !== "03215" &&
-                           a.properties.ZCTA5CE10 !== "03285" &&
-                           a.properties.ZCTA5CE10 !== "03251" &&
-                           a.properties.ZCTA5CE10 !== "03812" &&
-                           a.properties.ZCTA5CE10 !== "03593" &&
-                           a.properties.ZCTA5CE10 !== "03575" &&
-                           a.properties.ZCTA5CE10 !== "03818" &&
-                           a.properties.ZCTA5CE10 !== "03838" &&
-                           a.properties.ZCTA5CE10 !== "03570" &&
-                           a.properties.ZCTA5CE10 !== "03583" &&
-                           a.properties.ZCTA5CE10 !== "03581" &&
-                           a.properties.ZCTA5CE10 !== "03582" &&
-                           a.properties.ZCTA5CE10 !== "03584" &&
-                           a.properties.ZCTA5CE10 !== "03588" 
-                           )
-                          
-                  }))
-                .attr("class", "boundary")
-                .attr("d", path);
-
-            //g_nh.exit().remove();
-
-
-            /*
-             * Maine
-             */
-            g_me.attr("class", "maine")
-              .selectAll("path")
-                .data(topojson.feature(map, map.objects.g_maine).features)
-              .enter().append("path")
+                  .enter().append("path")
                 // Adds the zip code as a class of the path
-                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
+                .attr("class", function(d) {
+                  return d.properties.ZCTA5CE10; + " town"
+                })
                 .attr("d", path)
-                .style("fill", function(d, i) { 
-                    if(!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
-                    }
-                    else {
-                      return color(amtByZip[d.properties.ZCTA5CE10]); 
-                    }
-                });
+                .style("fill-opacity", 0)
+                .style("fill", "white")
 
-            // paints the state border
-            g_me.append("path")
-                .datum(topojson.mesh(map, map.objects.g_maine, function(a, b) { 
-                    return a === b && 
-
-                           // don't display boundry lines on the interior (ie: lakes)
-                           a.properties.ZCTA5CE10 !== "04084" &&
-                           a.properties.ZCTA5CE10 !== "04029" &&
-                           a.properties.ZCTA5CE10 !== "04055" &&
-                           a.properties.ZCTA5CE10 !== "04015" &&
-                           a.properties.ZCTA5CE10 !== "04071" &&
-                           a.properties.ZCTA5CE10 !== "04062" &&
-                           a.properties.ZCTA5CE10 !== "04982" &&
-                           a.properties.ZCTA5CE10 !== "04936" &&
-                           a.properties.ZCTA5CE10 !== "04961" &&
-                           a.properties.ZCTA5CE10 !== "04945" &&
-                           a.properties.ZCTA5CE10 !== "04985" 
-                  }))
-                .attr("class", "boundary")
-                .attr("d", path);
-
-            //g_me.exit().remove();
-
-
-            /*
-             * Massachusetts
-             */
-            g_ma.attr("class", "mass")
-              .selectAll("path")
-                .data(topojson.feature(map, map.objects.g_mass).features)
-              .enter().append("path")
-                .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
-                .attr("d", path)
-                .style("fill", function(d, i) { 
-                  if(!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
-                    }
-                    else {
-                      return color(amtByZip[d.properties.ZCTA5CE10]); 
-                    } 
+                .transition()
+                  .duration(100)
+                  .style("fill-opacity", 1)
+                  .style("fill", function(d, i) {
+                    return color(amtByZip[d.properties.ZCTA5CE10]);
                   });
-
-             // paints the state border
-            g_ma.append("path")
-                .datum(topojson.mesh(map, map.objects.g_mass, function(a, b) { 
-                    return a === b &&
-
-                           // don't display boundry lines on the interior (ie: lakes)
-                           a.properties.ZCTA5CE10 !== "01366" &&
-                           a.properties.ZCTA5CE10 !== "01355" && 
-                           a.properties.ZCTA5CE10 !== "01331" && 
-                           a.properties.ZCTA5CE10 !== "01368" && 
-                           a.properties.ZCTA5CE10 !== "01523" && 
-                           a.properties.ZCTA5CE10 !== "01467" && 
-                           a.properties.ZCTA5CE10 !== "01434" && 
-                           a.properties.ZCTA5CE10 !== "01451" 
-
-                  }))
-                .attr("class", "boundary")
-                .attr("d", path);
-
-            //g_ma.exit().remove();
-
-
-              var town = g.selectAll(".town").on("click", click);
-
-            /*
-            nhTown
-             .enter()
-              .insert("path")
-              .attr("class", function(d,i) { return d.name + " country"; })   
-                .attr("title", function(d,i) { return d.name; })  // country name
-                .attr("d", path)
-                .on("click", click);
-                */
-
-            // Show/hide tooltip
-            town
-              .on("mousemove", function(d,i) {
-                var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
-
-                tooltip
-                  .classed("hidden", false)
-                  .attr("style", "left:" + (mouse[0]+30) + "px;top:" + (mouse[1]-10) + "px")
-                  //.attr("id", function(data, index) { console.log(donation.town); })
-                  //.html(d.properties.ZCTA5CE10)
-                  .html(
-                    "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
-                    "<br />Zip: " + d.properties.ZCTA5CE10 +
-                    "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
-                    "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10]
-                  )
-              })
-              .on("mouseout",  function(d,i) {
-                tooltip.classed("hidden", true)
-              });
-
-              slickGrid(donation);
-
-          }  
-
-
-
-          function redraw(year) {
-
-            
-
-            var amtByZip = new Object();
-            var townByZip = {};
-            var contByZip = {};
-            var filter;
-
-            d3.csv("data/data.csv", function(csv) {
-              filter = csv.filter(function(row) {
-                  return row['year'] == year;
-              })
-
-
-              slickGrid(filter);
-
-              for (var i=0; i < filter.length; i++) {
-                  //console.log(filter[i].zip + ": " + filter[i].amt);
-                  amtByZip[filter[i].zip] = +filter[i].amt
-              }
-
-
-              d3.json("data/ne-map10pct.json", function(map) {
-                g_vt.selectAll("vermont")
-                    .data(topojson.feature(map, map.objects.g_vermont).features)
-                  .enter().append("path")
-                    // Adds the zip code as a class of the path
-                    .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
-                    .attr("d", path)
-                    //.style("fill", "red");
-                    .transition()
-                      .duration(100)
-                    .style("fill", function(d, i) { 
-                      if(!amtByZip[d.properties.ZCTA5CE10]) {
-                          return "#D8D8D8";
-                        }
-                        else {
-                          return color(amtByZip[d.properties.ZCTA5CE10]); 
-                        } 
-                      });
-
-                g_nh.selectAll("new_hamp")
-                    .data(topojson.feature(map, map.objects.g_nh).features)
-                  .enter().append("path")
-                    // Adds the zip code as a class of the path
-                    .attr("class", function(d) { return d.properties.ZCTA5CE10; + " town"})
-                    .attr("d", path)
-                    .style("fill-opacity", 0)
-                    .style("fill", "white")
-                    
-                    .transition()
-                      .duration(100)
-                    .style("fill-opacity", 1)
-                    .style("fill", function(d, i) { return color(amtByZip[d.properties.ZCTA5CE10]); });
-                    /*
+              /*
                     .style("fill", function(d, i) { 
                       if(!amtByZip[d.properties.ZCTA5CE10]) {
                           return "#D8D8D8";
@@ -549,96 +466,116 @@
                         } 
                       });
                     */
-                    // .exit().remove(); //error
-                    
+              // .exit().remove(); //error
 
-                //filter.exit().remove(); //error
-                // g_nh.exit().remove();  // error
-
-                g_ma.selectAll("mass")
-                    .data(topojson.feature(map, map.objects.g_mass).features)
-                  .enter().append("path")
-                    // Adds the zip code as a class of the path
-                    .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
-                    .attr("d", path)
-                    //.style("fill", "red");
-                    .transition()
-                      .duration(100)
-                    .style("fill", function(d, i) { 
-                      if(!amtByZip[d.properties.ZCTA5CE10]) {
-                          return "#D8D8D8";
-                        }
-                        else {
-                          return color(amtByZip[d.properties.ZCTA5CE10]); 
-                        } 
-                      });
-
-                g_me.selectAll("maine")
-                    .data(topojson.feature(map, map.objects.g_maine).features)
-                  .enter().append("path")
-                    // Adds the zip code as a class of the path
-                    .attr("class", function(d) { return d.properties.ZCTA5CE10 + " town"; })
-                    .attr("d", path)
-                    //.style("fill", "red");
-                    .transition()
-                      .duration(100)
-                    .style("fill", function(d, i) { 
-                      if(!amtByZip[d.properties.ZCTA5CE10]) {
-                          return "#D8D8D8";
-                        }
-                        else {
-                          return color(amtByZip[d.properties.ZCTA5CE10]); 
-                        } 
-                      });
-              })
 
               //filter.exit().remove(); //error
+              // g_nh.exit().remove();  // error
 
-              
+              g_ma.selectAll("mass")
+                .data(topojson.feature(map, map.objects.g_mass).features)
+                  .enter().append("path")
+                // Adds the zip code as a class of the path
+                .attr("class", function(d) {
+                  return d.properties.ZCTA5CE10 + " town";
+                })
+                .attr("d", path)
+                //.style("fill", "red");
+                .transition()
+                  .duration(100)
+                  .style("fill", function(d, i) {
+                    if (!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    } 
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]);
+                    }
+                });
 
-            });
+              g_me.selectAll("maine")
+                .data(topojson.feature(map, map.objects.g_maine).features)
+                  .enter().append("path")
+                // Adds the zip code as a class of the path
+                .attr("class", function(d) {
+                  return d.properties.ZCTA5CE10 + " town";
+                })
+                .attr("d", path)
+                //.style("fill", "red");
+                .transition()
+                  .duration(100)
+                  .style("fill", function(d, i) {
+                    if (!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    } 
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]);
+                    }
+                  });
+            })
+
+            //filter.exit().remove(); //error
 
 
-
-
-
-            //filter.exit().remove();  // error
-            // all.exit().remove();  // error
-
-          } 
-
-
-          function slickGrid(data) {
-
-            console.log(data);
-              var grid;
-              var columns = [
-                {id: "year", name: "Year", field: "year"},
-                {id: "town", name: "Town", field: "town"},
-                {id: "state", name: "State", field: "state"},
-                {id: "zip", name: "Zip Code", field: "zip"},
-                {id: "signal", name: "Signal", field: "signal"},
-                {id: "amt", name: "Amount", field: "amt"},
-                {id: "contrib", name: "# Contributions", field: "contrib"}
-              ];
-
-              var options = {
-                enableCellNavigation: true,
-                enableColumnReorder: false
-              };
-
-              grid = new Slick.Grid("#table", data, columns, options);
-
-          }
-
-
-          d3.select("#slide").on("change", function() { 
-              redraw(this.value);
           });
 
 
-          
-   </script>
+          //filter.exit().remove();  // error
+          // all.exit().remove();  // error
 
- </body>
+        }
+
+
+        function slickGrid(data) {
+
+          console.log(data);
+          var grid;
+          var columns = [{
+              id: "year",
+              name: "Year",
+              field: "year"
+            }, {
+              id: "town",
+              name: "Town",
+              field: "town"
+            }, {
+              id: "state",
+              name: "State",
+              field: "state"
+            }, {
+              id: "zip",
+              name: "Zip Code",
+              field: "zip"
+            }, {
+              id: "signal",
+              name: "Signal",
+              field: "signal"
+            }, {
+              id: "amt",
+              name: "Amount",
+              field: "amt"
+            }, {
+              id: "contrib",
+              name: "# Contributions",
+              field: "contrib"
+            }
+          ];
+
+          var options = {
+            enableCellNavigation: true,
+            enableColumnReorder: false
+          };
+
+          grid = new Slick.Grid("#table", data, columns, options);
+
+        }
+
+
+        d3.select("#slide").on("change", function() {
+          redraw(this.value);
+        });
+
+
+          
+    </script>
+  </body>
 </html>
