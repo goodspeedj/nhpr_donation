@@ -24,6 +24,16 @@ div.tooltip {
   position: absolute;
 }
 
+body {
+  font-family: arial;
+  font-size: 8pt;
+}
+
+#table {
+  font-family: arial;
+  font-size: 8pt;
+}
+
 .town {
   fill: #CCCCCC;
   /*fill-opacity: 0;*/

@@ -20,6 +20,7 @@
     <script src="js/jquery.event.drag-2.2.js" charset="utf-8"></script>
     <script src="js/slick.core.js" charset="utf-8"></script>
     <script src="js/slick.grid.js" charset="utf-8"></script>
+    <script src="js/jquery-ui-1.10.3.custom.min.js" charset="utf-8"></script>
 
   </head>
   <body>
@@ -527,43 +528,51 @@
 
         function slickGrid(data) {
 
-          console.log(data);
           var grid;
           var columns = [{
               id: "year",
               name: "Year",
-              field: "year"
+              field: "year",
+              sortable: true
             }, {
               id: "town",
               name: "Town",
-              field: "town"
+              field: "town",
+              sortable: true
             }, {
               id: "state",
               name: "State",
-              field: "state"
+              field: "state",
+              sortable: true
             }, {
               id: "zip",
               name: "Zip Code",
-              field: "zip"
+              field: "zip",
+              sortable: true
             }, {
               id: "signal",
               name: "Signal",
-              field: "signal"
+              field: "signal", 
+              sortable: true
             }, {
               id: "amt",
               name: "Amount",
-              field: "amt"
+              field: "amt",
+              sortable: true
             }, {
               id: "contrib",
               name: "# Contributions",
-              field: "contrib"
+              field: "contrib",
+              sortable: true
             }
           ];
 
-          var options = {
-            enableCellNavigation: true,
-            enableColumnReorder: false
-          };
+            var options = {
+              enableCellNavigation: true,
+              enableColumnReorder: true,
+              cellHighlightCssClass: true,
+              multiColumnSort: true
+            };
 
           grid = new Slick.Grid("#table", data, columns, options);
 
