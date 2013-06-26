@@ -1,5 +1,4 @@
 #header {
-  background: #d7dabd;
   margin-top: 0;
 }
 
@@ -24,7 +23,7 @@
 
 #table {
   width: 600px;
-  height: 800px;
+  height: 770px;
   float: right;
 }
 
@@ -39,6 +38,7 @@
   font-family: serif;
   margin-top: 0;
   margin-bottom: 0;
+  margin-left: 20px;
 }
 
 .sub-header {
@@ -47,8 +47,14 @@
   font-family: serif;
   margin-top: 0;
   margin-bottom: 2px;
+  margin-left: 20px;
 }
 
+hr {
+    border: 0;
+    height: 1px;
+    background-image: -webkit-linear-gradient(left, #ccc, #333, #ccc);
+}
 
 
 
