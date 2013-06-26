@@ -25,22 +25,54 @@
   </head>
   <body>
 
-    <div id="map"></div>
+    <div id="header">
+      <p class="nhpr_logo">nhpr</p>
+      <p class="sub-header">Our Donors</p>
+    </div>
+    <div id="container">
+      <div id="map"></div>
+      <div id="slider-vertical"></div>
+      <div id="slider-label">
+        <p>
+          <label for="years">Year(s):</label><br />
+          <input type="text" id="years" style="border: 0; color: #f6931f; font-weight: bold;" />
+        </p>
+      </div>
+    </div>
+    <div id="table"></div>
+    <div id="footer">footer</div>
+
 
     <div id="slider">
       1999 <input id="slide" type="range" min="1999" max="2012" step="1" value="2012" /> 2012
     </div>
 
-    <div id="year">2012</div>
+    
 
-    <div id="table" style="width:600px;height:500px;"></div>
+    
 
 
     <script type="text/javascript">
 
-        var width = 550;
+        $(function() {
+          $( "#slider-vertical" ).slider({
+            orientation: "vertical",
+            range: true,
+            min: 1999,
+            max:2012,
+            values: [ 2011, 2012 ],
+            slide: function( event, ui ) {
+              $( "#years" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+            }
+          });
+          $( "#years" ).val( $( "#slider-vertical" ).slider( "values", 0 ) +
+            " - " + $( "#slider-vertical" ).slider( "values", 1 ) );
+        });
+
+        var width = 600;
         var height = 770;
         var active;
+        var town;
 
         var tooltip = d3.select("#map").append("div")
           .attr("class", "tooltip");
@@ -64,9 +96,9 @@
 
         var projection = d3.geo.albers()
           .center([0, 43.9])
-          .rotate([71.5, 0])
+          .rotate([71.6, 0])
           .parallels([50, 60])
-          .scale(15000)
+          .scale(15500)
           .translate([width / 2, height / 2]);
 
         var path = d3.geo.path()
@@ -96,6 +128,8 @@
          // function to zoom in on a country in the map by user click
 
         function click(d) {
+
+          console.log("click");
 
           // if already active clicking will de-activate
           if (active === d) return reset();
@@ -368,7 +402,7 @@
           //g_ma.exit().remove();
 
 
-          var town = g.selectAll(".town").on("click", click);
+          town = g.selectAll(".town").on("click", click);
 
           // Show/hide tooltip
           town
@@ -399,6 +433,13 @@
 
         function redraw(year) {
 
+          //town = g.selectAll(".town").on("click", console.log("wtf"));
+
+          var test = g_nh.selectAll(".town");
+
+          //console.log(test);
+
+          //test.on("click", alert("confused"));
 
           var amtByZip = new Object();
           var townByZip = {};
@@ -414,8 +455,9 @@
             slickGrid(filter);
 
             for (var i = 0; i < filter.length; i++) {
-              //console.log(filter[i].zip + ": " + filter[i].amt);
-              amtByZip[filter[i].zip] = +filter[i].amt
+              //console.log(filter[i].zip + ": " + filter[i].town);
+              amtByZip[filter[i].zip] = +filter[i].amt;
+              townByZip[filter[i].zip] = +filter[i].town;
             }
 
 
@@ -445,18 +487,20 @@
                   .enter().append("path")
                 // Adds the zip code as a class of the path
                 .attr("class", function(d) {
-                  return d.properties.ZCTA5CE10; + " town"
+                  return d.properties.ZCTA5CE10 + " town";
                 })
                 .attr("d", path)
-                .style("fill-opacity", 0)
-                .style("fill", "white")
-
+                //.style("fill", "red");
                 .transition()
                   .duration(100)
-                  .style("fill-opacity", 1)
                   .style("fill", function(d, i) {
-                    return color(amtByZip[d.properties.ZCTA5CE10]);
-                  });
+                    if (!amtByZip[d.properties.ZCTA5CE10]) {
+                      return "#D8D8D8";
+                    } 
+                    else {
+                      return color(amtByZip[d.properties.ZCTA5CE10]);
+                    }
+                });
               /*
                     .style("fill", function(d, i) { 
                       if(!amtByZip[d.properties.ZCTA5CE10]) {
@@ -516,8 +560,38 @@
 
             //filter.exit().remove(); //error
 
+            
+
+            /* Show/hide tooltip
+            town
+              .on("mousemove", function(d, i) {
+                console.log(d, i);
+                var mouse = d3.mouse(svg.node()).map(function(d) {
+                  return parseInt(d);
+              });
+
+              
+
+              tooltip
+                .classed("hidden", false)
+                .attr("style", "left:" + (mouse[0] + 30) + "px;top:" + (mouse[1] - 10) + "px")
+                //.attr("id", function(data, index) { console.log(donation.town); })
+                //.html(d.properties.ZCTA5CE10)
+                .html(
+                  "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
+                  "<br />Zip: " + d.properties.ZCTA5CE10 +
+                  "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
+                  "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10])
+              })
+              .on("mouseout", function(d, i) {
+                tooltip.classed("hidden", true)
+              });
+              */
+
 
           });
+
+          
 
 
           //filter.exit().remove();  // error

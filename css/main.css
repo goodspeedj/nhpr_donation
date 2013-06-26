@@ -1,3 +1,58 @@
+#header {
+  background: #d7dabd;
+  margin-top: 0;
+}
+
+#map {
+  width: 100%;
+  float: left;
+  background: #f1f2ea;
+  margin-right: -770px;
+  margin-left: 50px;
+}
+
+#slider-vertical {
+  height: 300px;
+  margin-top: 150px;
+  width: 10px;
+  float: left;
+}
+
+#slider-label {
+  
+}
+
+#table {
+  width: 600px;
+  height: 800px;
+  float: right;
+}
+
+#footer {
+  background: #d7dabd;
+  clear: both; 
+}
+
+.nhpr_logo {
+  color: #B21901;
+  font-size: 36px;
+  font-family: serif;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.sub-header {
+  color: #B21901;
+  font-size: 20px;
+  font-family: serif;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+
+
+
+
 #mapbg {
   fill: none; 
   fill-opacity: 0;
