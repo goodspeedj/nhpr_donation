@@ -64,6 +64,7 @@
             values: [ 2011, 2012 ],
             slide: function( event, ui ) {
               $( "#years" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+              redraw(ui.values[0], ui.values[1]);
             }
           });
           $( "#years" ).val( $( "#slider-vertical" ).slider( "values", 0 ) +
@@ -250,7 +251,7 @@
             .attr("d", path)
             .style("fill", function(d, i) {
             if (!amtByZip[d.properties.ZCTA5CE10]) {
-              return "#D8D8D8";
+              return "#FBFBEF";
             } 
             else {
               return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -281,7 +282,7 @@
             .attr("d", path)
             .style("fill", function(d, i) {
             if (!amtByZip[d.properties.ZCTA5CE10]) {
-              return "#D8D8D8";
+              return "#FBFBEF";
             } 
             else {
               return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -330,7 +331,7 @@
             .attr("d", path)
             .style("fill", function(d, i) {
             if (!amtByZip[d.properties.ZCTA5CE10]) {
-              return "#D8D8D8";
+              return "#FBFBEF";
             } 
             else {
               return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -374,7 +375,7 @@
             .attr("d", path)
             .style("fill", function(d, i) {
             if (!amtByZip[d.properties.ZCTA5CE10]) {
-              return "#D8D8D8";
+              return "#FBFBEF";
             } 
             else {
               return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -432,7 +433,7 @@
         }
 
 
-        function redraw(year) {
+        function redraw(year1, year2) {
 
           //town = g.selectAll(".town").on("click", console.log("wtf"));
 
@@ -449,7 +450,7 @@
 
           d3.csv("data/data.csv", function(csv) {
             filter = csv.filter(function(row) {
-              return row['year'] == year;
+              return row['year'] >= year1 && row['year'] <= year2;
             })
 
 
@@ -471,12 +472,14 @@
                   return d.properties.ZCTA5CE10 + " town";
                 })
                 .attr("d", path)
-                //.style("fill", "red");
+                .style("fill-opacity", 0)
                 .transition()
-                  .duration(100)
+                  .duration(200)
+                  .delay(400)
+                  .style("fill-opacity", 1)
                   .style("fill", function(d, i) {
                     if (!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
+                      return "#FBFBEF";
                     } 
                     else {
                       return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -491,12 +494,14 @@
                   return d.properties.ZCTA5CE10 + " town";
                 })
                 .attr("d", path)
-                //.style("fill", "red");
+                .style("fill-opacity", 0)
                 .transition()
-                  .duration(100)
+                  .duration(200)
+                  .delay(300)
+                  .style("fill-opacity", 1)
                   .style("fill", function(d, i) {
                     if (!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
+                      return "#FBFBEF";
                     } 
                     else {
                       return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -526,12 +531,14 @@
                   return d.properties.ZCTA5CE10 + " town";
                 })
                 .attr("d", path)
-                //.style("fill", "red");
+                .style("fill-opacity", 0)
                 .transition()
-                  .duration(100)
+                  .duration(200)
+                  .delay(200)
+                  .style("fill-opacity", 1)
                   .style("fill", function(d, i) {
                     if (!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
+                      return "#FBFBEF";
                     } 
                     else {
                       return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -546,12 +553,14 @@
                   return d.properties.ZCTA5CE10 + " town";
                 })
                 .attr("d", path)
-                //.style("fill", "red");
+                .style("fill-opacity", 0)
                 .transition()
-                  .duration(100)
+                  .duration(200)
+                  .delay(100)
+                  .style("fill-opacity", 1)
                   .style("fill", function(d, i) {
                     if (!amtByZip[d.properties.ZCTA5CE10]) {
-                      return "#D8D8D8";
+                      return "#FBFBEF";
                     } 
                     else {
                       return color(amtByZip[d.properties.ZCTA5CE10]);
@@ -676,6 +685,7 @@
         d3.select("#slide").on("change", function() {
           redraw(this.value);
         });
+
 
 
           

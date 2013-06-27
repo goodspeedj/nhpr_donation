@@ -18,7 +18,8 @@
 }
 
 #slider-label {
-  
+  width: 200px;
+  margin-left: 70px;
 }
 
 #table {
@@ -96,8 +97,7 @@ body {
 }
 
 .town {
-  fill: #CCCCCC;
-  /*fill-opacity: 0;*/
+  fill: none;
   stroke: gray;
   stroke-width: .5px;
   stroke-linejoin: round;
@@ -106,14 +106,6 @@ body {
 
 .hidden { 
   display: none; 
-}
-
-.active {
-  fill-opacity: 1.5;
-}
-
-.inactive {
-  fill-opacity: .5;
 }
 
 .boundary {
