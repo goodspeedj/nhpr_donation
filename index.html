@@ -26,8 +26,8 @@
   <body>
 
     <div id="header">
-      <p class="nhpr_logo">nhpr</p>
-      <p class="sub-header">Our Donors</p>
+      <p class="nhpr_logo">nhpr donors</p>
+      
       <hr>
     </div>
     <div id="container">
@@ -70,7 +70,7 @@
             " - " + $( "#slider-vertical" ).slider( "values", 1 ) );
         });
 
-        var width = 600;
+        var width = 550;
         var height = 770;
         var active;
         var town;
@@ -92,7 +92,7 @@
         var color = d3.scale.quantile()
           .domain([500, 1000, 2500, 5000, 7500, 10000, 25000, 50000, 100000, 200000])
            //.range(colorbrewer.Set3[9]);
-          .range(colorbrewer.Greens[8]);
+          .range(colorbrewer.YlOrRd[9]);
 
 
         var projection = d3.geo.albers()
@@ -642,14 +642,33 @@
             }
           ];
 
-            var options = {
+          var options = {
               enableCellNavigation: true,
               enableColumnReorder: true,
-              cellHighlightCssClass: true,
               multiColumnSort: true
-            };
+          };
 
           grid = new Slick.Grid("#table", data, columns, options);
+
+          // Sort on column headers
+          grid.onSort.subscribe(function (e, args) {
+            var cols = args.sortCols;
+
+            data.sort(function (dataRow1, dataRow2) {
+              for (var i = 0, l = cols.length; i < l; i++) {
+                var field = cols[i].sortCol.field;
+                var sign = cols[i].sortAsc ? 1 : -1;
+                var value1 = dataRow1[field], value2 = dataRow2[field];
+                var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+                if (result != 0) {
+                  return result;
+                }
+              }
+              return 0;
+            });
+            grid.invalidate();
+            grid.render();
+          });
 
         }
 
