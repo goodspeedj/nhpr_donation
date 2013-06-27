@@ -7,13 +7,13 @@
   float: left;
   background: #f1f2ea;
   margin-right: -770px;
-  margin-left: 50px;
+  margin-left: 30px;
 }
 
 #slider-vertical {
   height: 300px;
   margin-top: 150px;
-  width: 10px;
+  margin-left: 70px;
   float: left;
 }
 
@@ -43,7 +43,7 @@
 
 .sub-header {
   color: #B21901;
-  font-size: 20px;
+  font-size: 26px;
   font-family: serif;
   margin-top: 0;
   margin-bottom: 2px;
