@@ -50,18 +50,17 @@
         $(function() {
           $( "#slider-vertical" ).slider({
             orientation: "vertical",
-            range: true,
+            range: "min",
             min: 1999,
-            max:2012,
-            values: [ 2011, 2012 ],
+            max:2013,
+            value: 2013,
             slide: function( event, ui ) {
-              $( "#years" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+              $( "#years" ).val( ui.value );
               //redraw(ui.values[0], ui.values[1]);
-              updateFill();
+              updateFill(ui.value);
             }
           });
-          $( "#years" ).val( $( "#slider-vertical" ).slider( "values", 0 ) +
-            " - " + $( "#slider-vertical" ).slider( "values", 1 ) );
+          $( "#years" ).val( $( "#slider-vertical" ).slider( "value" ) );
         });
 
         var width = 550;
@@ -180,7 +179,7 @@
           // Show/hide tooltip
           town.on("mousemove", function(d, i) {
             var mouse = d3.mouse(svg.node()).map(function(d) {
-              console.log(d);
+              //console.log(d);
               return parseInt(d);
             });
 
@@ -218,7 +217,7 @@
           
 
           donation = donation.filter(function(d) {
-            return d.year == 2012
+            return d.year == 2013
           });
 
           donation.forEach(function(d) {
@@ -242,7 +241,7 @@
               .enter().append("path")
             // Adds the zip code as a class of the path
             .attr("class", function(d) {
-              return d.properties.ZCTA5CE10 + " town";
+              return "_" + d.properties.ZCTA5CE10 + " town";
             })
             .attr("d", path)
             .style("fill", function(d, i) {
@@ -273,7 +272,7 @@
             .data(topojson.feature(map, map.objects.g_nh).features)
               .enter().append("path")
             .attr("class", function(d) {
-              return d.properties.ZCTA5CE10 + " town";
+              return "_" + d.properties.ZCTA5CE10 + " town";
             })
             .attr("d", path)
             .style("fill", function(d, i) {
@@ -322,7 +321,7 @@
               .enter().append("path")
             // Adds the zip code as a class of the path
             .attr("class", function(d) {
-              return d.properties.ZCTA5CE10 + " town";
+              return "_" + d.properties.ZCTA5CE10 + " town";
             })
             .attr("d", path)
             .style("fill", function(d, i) {
@@ -366,7 +365,7 @@
             .data(topojson.feature(map, map.objects.g_mass).features)
               .enter().append("path")
             .attr("class", function(d) {
-              return d.properties.ZCTA5CE10 + " town";
+              return "_" + d.properties.ZCTA5CE10 + " town";
             })
             .attr("d", path)
             .style("fill", function(d, i) {
@@ -504,12 +503,11 @@
         }
 
 
-        function updateFill() {
+        function updateFill(year) {
           var town = g.selectAll(".town");
-          //console.log(town);
 
 
-          var year = 2000;
+          //var year = 2000;
 
           var amtByZip = new Object();
           var townByZip = {};
@@ -517,33 +515,54 @@
           var filter;
 
           d3.csv("data/data.csv", function(csv) {
+
             filter = csv.filter(function(row) {
-              return row['year'] = year;
+              return row['year'] == year;
               //return row['year'] >= year1 && row['year'] <= year2;
-            })
+            });
 
-            console.log(filter);
+            for (var i = 0; i < filter.length; i++) {
+              //console.log(filter[i].zip + ": " + filter[i].amt);
+              amtByZip[filter[i].zip] = +filter[i].amt;
+              townByZip[filter[i].zip] = +filter[i].town;
+            }
 
-
+            //console.log(amtByZip[filter[i].zip]);
 
             slickGrid(filter);
 
-            for (var i = 0; i < filter.length; i++) {
-              //console.log(filter[i].zip + ": " + filter[i].town);
-              //amtByZip[filter[i].zip] = +filter[i].amt;
-              //townByZip[filter[i].zip] = +filter[i].town;
+            //for (var i = 0; i < filter.length; i++) {
+            for (var i in amtByZip) {
 
-              d3.select("." + filter[i].zip)
+              //console.log(filter[i].zip + ": " + filter[i].amt);
+              //console.log("amtByZip[i]: " + amtByZip[i]);
+              var amt = amtByZip[i]
+
+              // update the town fill color
+              d3.select("._" + i)
+                .transition()
+                  .duration(3000)
+                  .delay(500)
                 .style("fill", function(d, i) {
-                    if (!amtByZip[d.properties.ZCTA5CE10]) {
+
+                    console.log("amtByZip[i] = " + amt);
+                    //console.log("filter[i].zip/amt = " + filter[i].zip + ": " + filter[i].amt);
+
+                    if (!amt) {
                       return "#FBFBEF";
                     } 
                     else {
-                      return color(amtByZip[d.properties.ZCTA5CE10]);
+                      return color(amt);
                     }
-                };
+                });
             }
+
+            //console.log("amtByZip: " + amtByZip);
+            //console.log("amtByZip - 03301: " + amtByZip['03301']);
+
           });
+
+          //toolTip();
         }
 
           
