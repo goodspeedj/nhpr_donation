@@ -113,6 +113,7 @@
         var g_me = g.append("g");
         var g_nh = g.append("g");
         var g_vt = g.append("g");
+        var g_signal = g.append("g");
 
         var amtByZip = new Object();
         var townByZip = {};
@@ -214,7 +215,7 @@
 
         function ready(error, map, donation) {
 
-          
+          signals();
 
           donation = donation.filter(function(d) {
             return d.year == 2013
@@ -425,7 +426,7 @@
             */
 
           slickGrid(donation);
-          signals();
+          
           toolTip(map);
 
         }
@@ -563,12 +564,11 @@
 
           });
 
-          signals();
         }
 
         function signals() {
           var dataset = [5, 10, 15];
-          var wevo = svg.selectAll("svg")
+          var wevo = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -577,7 +577,7 @@
                         .attr("cy", 555)
                         .attr("r", 162);
 
-          var wevf = svg.selectAll("svg")
+          var wevf = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -586,7 +586,7 @@
                         .attr("cy", 120)
                         .attr("r", 70);
 
-          var wevc = svg.selectAll("svg")
+          var wevc = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -595,7 +595,7 @@
                         .attr("cy", 195)
                         .attr("r", 70);
 
-          var wevq = svg.selectAll("svg")
+          var wevq = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -604,7 +604,7 @@
                         .attr("cy", 295)
                         .attr("r", 100);
 
-          var wevj = svg.selectAll("svg")
+          var wevj = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -613,7 +613,7 @@
                         .attr("cy", 340)
                         .attr("r", 100);
 
-          var wevn = svg.selectAll("svg")
+          var wevn = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -622,7 +622,7 @@
                         .attr("cy", 640)
                         .attr("r", 90);
 
-          var wevh = svg.selectAll("svg")
+          var wevh = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -631,7 +631,7 @@
                         .attr("cy", 440)
                         .attr("r", 100);
 
-          var w212af = svg.selectAll("svg")
+          var w212af = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -640,7 +640,7 @@
                         .attr("cy", 700)
                         .attr("r", 75);
 
-          var w247ao = svg.selectAll("svg")
+          var w247ao = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -649,7 +649,7 @@
                         .attr("cy", 400)
                         .attr("r", 40);
 
-          var w282ab = svg.selectAll("svg")
+          var w282ab = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
@@ -658,7 +658,7 @@
                         .attr("cy", 580)
                         .attr("r", 30);
 
-          var w282ab = svg.selectAll("svg")
+          var w282ab = g_signal.selectAll("svg")
                         .data(dataset)
                         .enter()
                         .append("circle")
