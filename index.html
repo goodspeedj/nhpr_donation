@@ -425,6 +425,7 @@
             */
 
           slickGrid(donation);
+          signals();
           toolTip(map);
 
         }
@@ -562,7 +563,111 @@
 
           });
 
-          //toolTip();
+          signals();
+        }
+
+        function signals() {
+          var dataset = [5, 10, 15];
+          var wevo = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 280)
+                        .attr("cy", 555)
+                        .attr("r", 162);
+
+          var wevf = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 310)
+                        .attr("cy", 120)
+                        .attr("r", 70);
+
+          var wevc = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 365)
+                        .attr("cy", 195)
+                        .attr("r", 70);
+
+          var wevq = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 245)
+                        .attr("cy", 295)
+                        .attr("r", 100);
+
+          var wevj = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 410)
+                        .attr("cy", 340)
+                        .attr("r", 100);
+
+          var wevn = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 110)
+                        .attr("cy", 640)
+                        .attr("r", 90);
+
+          var wevh = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 130)
+                        .attr("cy", 440)
+                        .attr("r", 100);
+
+          var w212af = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 275)
+                        .attr("cy", 700)
+                        .attr("r", 75);
+
+          var w247ao = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 280)
+                        .attr("cy", 400)
+                        .attr("r", 40);
+
+          var w282ab = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 400)
+                        .attr("cy", 580)
+                        .attr("r", 30);
+
+          var w282ab = svg.selectAll("svg")
+                        .data(dataset)
+                        .enter()
+                        .append("circle")
+                        .attr("class", "signal")
+                        .attr("cx", 435)
+                        .attr("cy", 615)
+                        .attr("r", 25);
+
+
         }
 
           
