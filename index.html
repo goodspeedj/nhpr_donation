@@ -20,6 +20,7 @@
     <script src="js/jquery.event.drag-2.2.js" charset="utf-8"></script>
     <script src="js/slick.core.js" charset="utf-8"></script>
     <script src="js/slick.grid.js" charset="utf-8"></script>
+    <script src="js/slick.formatters.js"></script>
     <script src="js/jquery-ui-1.10.3.custom.min.js" charset="utf-8"></script>
 
   </head>
@@ -47,6 +48,12 @@
 
     <script type="text/javascript">
 
+        // Formats numbers to currenct
+        Number.prototype.toCurrencyString = function() { 
+          return "$" + Math.floor(this).toLocaleString() + (this % 1).toFixed(2).toLocaleString().replace(/^0/,''); }
+
+
+        // Slider bar
         $(function() {
           $( "#slider-vertical" ).slider({
             orientation: "vertical",
@@ -62,6 +69,8 @@
           });
           $( "#years" ).val( $( "#slider-vertical" ).slider( "value" ) );
         });
+
+
 
         var width = 550;
         var height = 770;
@@ -169,18 +178,28 @@
 
 
 
-        function toolTip(map, donation) {
+        function toolTip(data) {
 
-          //console.log("in toolTip");
+          data.forEach(function(d) {
+            amtByZip[d.zip] = +d.amt
+          });
+
+          data.forEach(function(d) {
+            townByZip[d.zip] = d.town
+          });
+
+          data.forEach(function(d) {
+            contByZip[d.zip] = d.contrib
+          });
 
           var town = g.selectAll(".town").on("click", click);
 
           //console.log(town);
 
           // Show/hide tooltip
-          town.on("mousemove", function(d, i) {
+          town
+            .on("mousemove", function(d, i) {
             var mouse = d3.mouse(svg.node()).map(function(d) {
-              //console.log(d);
               return parseInt(d);
             });
 
@@ -190,7 +209,7 @@
               .html(
                 "<span class='bold'>" + townByZip[d.properties.ZCTA5CE10] + "</span>" +
                 "<br />Zip: " + d.properties.ZCTA5CE10 +
-                "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10] +
+                "<br />Amount: " + amtByZip[d.properties.ZCTA5CE10].toCurrencyString() +
                 "<br />Contributions: " + contByZip[d.properties.ZCTA5CE10])
             })
 
@@ -427,7 +446,7 @@
 
           slickGrid(donation);
           
-          toolTip(map);
+          toolTip(donation);
 
         }
 
@@ -465,7 +484,8 @@
               id: "amt",
               name: "Amount",
               field: "amt",
-              sortable: true
+              formatter: Slick.Formatters.Currency,
+              sortable: true              
             }, {
               id: "contrib",
               name: "# Contributions",
@@ -536,8 +556,6 @@
             //for (var i = 0; i < filter.length; i++) {
             for (var i in amtByZip) {
 
-              //console.log(filter[i].zip + ": " + filter[i].amt);
-              //console.log("amtByZip[i]: " + amtByZip[i]);
               var amt = amtByZip[i]
 
               // update the town fill color
@@ -546,10 +564,6 @@
                   .duration(3000)
                   .delay(500)
                 .style("fill", function(d, i) {
-
-                    console.log("amtByZip[i] = " + amt);
-                    //console.log("filter[i].zip/amt = " + filter[i].zip + ": " + filter[i].amt);
-
                     if (!amt) {
                       return "#FBFBEF";
                     } 
@@ -561,6 +575,8 @@
 
             //console.log("amtByZip: " + amtByZip);
             //console.log("amtByZip - 03301: " + amtByZip['03301']);
+
+            toolTip(filter);
 
           });
 
